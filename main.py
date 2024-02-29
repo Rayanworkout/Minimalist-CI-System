@@ -4,8 +4,8 @@ from flask import Flask, request, render_template
 
 # Function to verify the signature
 # To ensure that the payload was sent from GitHub
-from validate_hash import verify_signature
-from perform_tests import run_tests
+from services.validate_hash import verify_signature
+from services.tester import run_tests
 
 app = Flask(__name__)
 
@@ -15,9 +15,6 @@ handler = logging.FileHandler("flask-app.log")  # Log to a file
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
-
-# 1 fonctionnalité par classe, découpage par services selon responsabilités
-
 
 TARGET_BRANCH = "main"
 

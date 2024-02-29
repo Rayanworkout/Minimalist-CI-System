@@ -10,12 +10,10 @@ fi
 
 project_folder="./projects/$1"
 
-if [ -d "$project_folder" ]; then
-    echo -e "\n$1 exists, pulling latest changes\n"
-    cd "$project_folder"
-    git pull origin main
-
-else
+if ! [ -d "$project_folder" ]; then
     # We clone the project inside the projects folder
     git clone "$2" "$project_folder"
+
+else
+    echo -e "\n$1 already exists, please run pull_latest_changes.sh instead\n"
 fi
