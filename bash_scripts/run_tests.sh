@@ -40,7 +40,7 @@ echo -e "\nvenv activated\n"
 # We install dependencies
 pip install -r "$project_path/requirements.txt"
 
-# Running tests and redirect output to a file
+# Running tests and redirect output to a junitxml standard file
 pytest --junitxml="$project_path/pytest_results.xml" "$project_path/$test_file"
 
 

@@ -36,7 +36,7 @@ def run_test_script(project_name: str, test_file_name: str) -> tuple[(ExitCodes,
 
     Returns tuple with (success: Boolean, optional error message)
 
-    Status codes:
+    Exit codes:
         see enums.py
 
     """
@@ -45,16 +45,19 @@ def run_test_script(project_name: str, test_file_name: str) -> tuple[(ExitCodes,
     )
 
     match return_code:
-        case ExitCodes.SUCCESS:
+        case ExitCodes.SUCCESS.value:
             return (True,)
-        case ExitCodes.MISSING_REQUIREMENTS:
+        case ExitCodes.MISSING_REQUIREMENTS.value:
             return (False, "requirements.txt does not exist")
-        case ExitCodes.MISSING_TEST_FILE:
+        case ExitCodes.MISSING_TEST_FILE.value:
             return (False, "test file does not exist")
-        case ExitCodes.VENV_CREATION_ERROR:
+        case ExitCodes.VENV_CREATION_ERROR.value:
             return (False, "Could not create venv folder.")
 
 
+def parse_junitxml_file(project_name: str) -> None:
+    pass
+
 if __name__ == "__main__":
     clone_or_pull_project("https://github.com/Rayanworkout/MinimalistWebServer")
-    print(run_test_script("MinimalistWebServer", "tests.py"))
+    run_test_script("MinimalistWebServer", "tests.py")
