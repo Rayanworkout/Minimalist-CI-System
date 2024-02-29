@@ -1,8 +1,22 @@
 import subprocess
 from enums import ExitCodes
+import os
 
 
 class Tester:
+
+    # Get the path of the current Python script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+
+    # Path to the bash_scripts directory
+    bash_scripts_dir = os.path.join(parent_dir, "bash_scripts")
+
+    # Now you can access the bash scripts using their filenames
+    clone_script_path = os.path.join(bash_scripts_dir, "clone_project.sh")
+    pull_script_path = os.path.join(bash_scripts_dir, "pull_latest_changes.sh")
+    test_script_path = os.path.join(bash_scripts_dir, "run_tests.sh")
+
     @classmethod
     def clone_project(cls, project_url: str) -> bool:
         """Clone a project inside projects/ folder.
@@ -23,7 +37,7 @@ class Tester:
         return_code = subprocess.call(
             [
                 "bash",
-                "bash_scripts/clone_project.sh",
+                cls.clone_script_path,
                 project_name,
                 project_url,
             ]
@@ -35,6 +49,7 @@ class Tester:
         else:
             return False
 
+    @classmethod
     def pull_latest_changes(cls, project_name: str) -> bool:
         """
         Pull latest changes from a project.
@@ -46,10 +61,7 @@ class Tester:
             True if script execution went well, otherwise False.
 
         """
-
-        return_code = subprocess.call(
-            ["bash", "bash_scripts/pull_latest_changes.sh", project_name]
-        )
+        return_code = subprocess.call(["bash", cls.pull_script_path, project_name])
 
         # Exit code 0 == success
         if return_code == ExitCodes.SUCCESS.value:
