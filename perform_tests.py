@@ -1,47 +1,56 @@
-import os
 import subprocess
+from enums import ExitCodes
 
 
-def run_script_in_venv(venv_path: str, tests_script_path: str, system: str) -> None:
+def clone_or_pull_project(project_url: str) -> bool:
+    """Clone or pull latest changes of a project.
+
+    params:
+        project_url: github project url as string, like this: https://github.com/username/project
+
+    The function calls a bash script to perform the operation, with 2 args: project url and project name.
+
+    Returns True if script execution went well, otherwise False.
+
     """
-    Run the tests python script in a virtual environment. We define commands
-    according to the operating system.
 
-    Arguments:
-        - venv_path: str: The path to the folder CONTAINING the virtual environment.
-        - tests_script_path: str: The path to the tests script.
-        - system: str: The operating system. Either "nt" or "posix".
+    # Extract project name from URL, last index after last /
+    project_name = project_url.split("/")[-1]
 
-    TODO: Catch exceptions and log them.
+    return_code = subprocess.call(
+        ["bash", "bash_scripts/clone_or_update_project.sh", project_name, project_url]
+    )
 
-    """
-    # Activate the virtual environment
-    if system == "nt":
-        activate_script = os.path.join(venv_path, "Scripts", "activate.bat")
-        activation_command = f"call {activate_script}"
-        command = f"python {tests_script_path}"
-
-    elif system == "posix":
-        activate_script = os.path.join(venv_path, "bin", "activate")
-        command = f"source {activate_script} && python3 {tests_script_path}"
-
+    # Exit code 0 == success
+    if return_code == 0:
+        return True
     else:
-        raise ValueError("Unsupported operating system")
-
-    subprocess.run(command, shell=True, check=True)
-
-    # Execute the command in a subprocess
-    # subprocess.run(command, shell=True, check=True)
+        return False
 
 
-PROJECT_FOLDER = "/home/rayan/dev/projects_backup/MinimalistWebServer"
-TESTS_FILE = "tests.py"
+def run_test_script(project_name: str, test_file_name: str) -> tuple[(ExitCodes, str)]:
+    """
+    Runs a bash script that creates a venv and installs project dependencies.
 
-VENV = True
-if VENV:
-    VENV_NAME = ".venv"
-    VENV_FULL_PATH = os.path.join(PROJECT_FOLDER, VENV_NAME)
-    
-    
+    The bash script then calls another bash script that run tests.
 
-    run_script_in_venv(VENV_FULL_PATH, TESTS_FILE, os.name)
+    Returns tuple with (success: Boolean, optional error message)
+
+    Status codes:
+        see enums.py
+
+    """
+    return_code = subprocess.call(["bash", "bash_scripts/run_tests.sh", project_name, test_file_name])
+
+    match return_code:
+        case ExitCodes.SUCCESS:
+            return (True,)
+        case ExitCodes.MISSING_REQUIREMENTS:
+            return (False, "requirements.txt does not exist")
+        case ExitCodes.VENV_CREATION_ERROR:
+            return (False, "Could not create venv folder.")
+
+
+if __name__ == "__main__":
+    clone_or_pull_project("https://github.com/Rayanworkout/MinimalistWebServer")
+    print(run_test_script("MinimalistWebServer", "tests.py"))

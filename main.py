@@ -16,6 +16,8 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
+# 1 fonctionnalité par classe, découpage par services selon responsabilités
+
 
 TARGET_BRANCH = "main"
 
