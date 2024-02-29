@@ -22,7 +22,7 @@ def clone_or_pull_project(project_url: str) -> bool:
     )
 
     # Exit code 0 == success
-    if return_code == 0:
+    if return_code == ExitCodes.SUCCESS:
         return True
     else:
         return False
@@ -40,13 +40,17 @@ def run_test_script(project_name: str, test_file_name: str) -> tuple[(ExitCodes,
         see enums.py
 
     """
-    return_code = subprocess.call(["bash", "bash_scripts/run_tests.sh", project_name, test_file_name])
+    return_code = subprocess.call(
+        ["bash", "bash_scripts/run_tests.sh", project_name, test_file_name]
+    )
 
     match return_code:
         case ExitCodes.SUCCESS:
             return (True,)
         case ExitCodes.MISSING_REQUIREMENTS:
             return (False, "requirements.txt does not exist")
+        case ExitCodes.MISSING_TEST_FILE:
+            return (False, "test file does not exist")
         case ExitCodes.VENV_CREATION_ERROR:
             return (False, "Could not create venv folder.")
 

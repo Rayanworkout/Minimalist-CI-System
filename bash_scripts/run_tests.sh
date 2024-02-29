@@ -13,6 +13,11 @@ if ! [ -f "$project_path/requirements.txt" ]; then
     exit 2
 fi
 
+# If test file does not exist, we stop program with exit status 3
+if ! [ -f "$project_path/$test_file" ]; then
+    echo -e "\nCannot proceed, $test_file does not exist at $project_path/\n"
+    exit 3
+fi
 
 # We create a venv if it doesn't exist
 if ! [ -d "./$project_path/.venv" ]; then
@@ -35,7 +40,7 @@ echo -e "\nvenv activated\n"
 # We install dependencies
 pip install -r "$project_path/requirements.txt"
 
-# Running tests
-pytest "$project_path/$test_file"
+# Running tests and redirect output to a file
+pytest --junitxml="$project_path/pytest_results.xml" "$project_path/$test_file"
 
 
