@@ -10,13 +10,13 @@ class Tester:
     """
 
     # Get the path of the current Python script
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
+    __current_dir = os.path.dirname(os.path.abspath(__file__))
+    __parent_dir = os.path.dirname(__current_dir)
 
     # Path to the bash_scripts directory
-    bash_scripts_dir = os.path.join(parent_dir, "bash_scripts")
+    __bash_scripts_dir = os.path.join(__parent_dir, "bash_scripts")
 
-    test_script_path = os.path.join(bash_scripts_dir, "run_tests.sh")
+    __test_script_path = os.path.join(__bash_scripts_dir, "run_tests.sh")
 
     @classmethod
     def run_test_script(
@@ -46,6 +46,11 @@ class Tester:
                 return (False, "test file does not exist")
             case ExitCodes.VENV_CREATION_ERROR.value:
                 return (False, "Could not create venv folder.")
+
+    @staticmethod
+    def get_junitxml_file(project_name: str) -> str:
+        project_folder = os.join()
+        xml_files = [file for file in os.listdir(project_folder) if file.endswith(".xml")]
 
     @classmethod
     def parse_junitxml_file(cls, project_name: str) -> None:
