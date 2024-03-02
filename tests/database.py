@@ -1,4 +1,4 @@
-import os
+import sqlite3
 import unittest
 import sys
 
@@ -9,9 +9,6 @@ from workers.database import DBWorker
 class TestDBWorker(unittest.TestCase):
     def setUp(self):
         self.db_worker = DBWorker("tests.sqlite3")
-
-    def tearDown(self):
-        self.db_worker.close()
 
     def test_insert_project(self):
         self.db_worker.insert_project("Project 1", "test_file_1.py", "github_url_1")
@@ -24,6 +21,12 @@ class TestDBWorker(unittest.TestCase):
         self.assertEqual(test_file, "test_file_1.py")
         self.assertEqual(github_url, "github_url_1")
         self.assertEqual(target_branch, "main")
+
+    def test_close_method_works(self):
+        self.db_worker.close()
+
+        with self.assertRaises(sqlite3.ProgrammingError):
+            self.db_worker.insert_project("Project 1", "test_file_1.py", "github_url_1")
 
     def test_insert_project_custom_branch(self):
         self.db_worker.insert_project(
@@ -49,6 +52,30 @@ class TestDBWorker(unittest.TestCase):
         self.assertIsNotNone(project)
 
         self.assertEqual(len(project), 5)
+
+    def test_insert_test_batch(self):
+        self.db_worker.insert_project("Project 4", "test_file_4.py", "github_url_4")
+
+        project = self.db_worker.get_project("project 4")
+
+        self.db_worker.insert_test_batch(project[0])  # id of the project
+
+        test_batches = self.db_worker.get_test_batches(project[0])
+
+        self.assertIsNotNone(test_batches)
+        self.assertEqual(len(test_batches), 4)  # id, name and project_id
+
+    def test_insert_batch_with_custom_name(self):
+
+        project = self.db_worker.get_project_by_id(1)
+
+        self.db_worker.insert_test_batch(project[0], "custom_name")
+
+        test_batch = self.db_worker.get_test_batches(project[0])
+
+        self.assertIsNotNone(test_batch)
+        self.assertEqual(len(test_batch), 4)
+        self.assertEqual(test_batch[1], "custom_name")
 
 
 if __name__ == "__main__":

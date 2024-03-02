@@ -51,6 +51,7 @@ class DBWorker:
         self.__cursor.execute(
             """CREATE TABLE IF NOT EXISTS test_batches (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name UNIQUE,
                     project_id INTEGER,
                     date TEXT DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (project_id) REFERENCES projects(id)
@@ -107,7 +108,21 @@ class DBWorker:
         self.__cursor.execute("""SELECT * FROM projects WHERE name = ?""", (name,))
         return self.__cursor.fetchone()
 
-    def insert_test_batch(self, project_id: int) -> None:
+    def get_project_by_id(self, project_id: int) -> tuple:
+        """
+        Get a project from the database by its id.
+
+        Params:
+            project_id: the id of the project
+
+        Returns:
+            A tuple with the project data
+
+        """
+        self.__cursor.execute("""SELECT * FROM projects WHERE id = ?""", (project_id,))
+        return self.__cursor.fetchone()
+
+    def insert_test_batch(self, project_id: int, name: str = "default") -> None:
         """
         Insert a test batch into the database.
 
@@ -115,10 +130,12 @@ class DBWorker:
             project_id: the id of the project
 
         """
+        if name == "default":
+            name = f"test_batch_{project_id}"
+
         self.__cursor.execute(
-            """INSERT INTO test_batches (project_id)
-                VALUES (?, ?)""",
-            (project_id,),
+            """INSERT OR IGNORE INTO test_batches (project_id, name) VALUES (?, ?)""",
+            (project_id, name),
         )
         self.__conn.commit()
 
@@ -135,7 +152,7 @@ class DBWorker:
         """
         self.__cursor.execute(
             """SELECT * FROM test_batches WHERE project_id = ?""",
-            (project_id),
+            (project_id,),
         )
         return self.__cursor.fetchone()
 
