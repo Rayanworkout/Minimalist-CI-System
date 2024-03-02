@@ -3,3 +3,4 @@
 projects/
 __pycache__/
 **.sqlite3
+templates/style.css
