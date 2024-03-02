@@ -92,3 +92,6 @@ class Tester:
 
 
 
+d = Tester.parse_junitxml_file("MinimalistWebServer")
+
+print(d)

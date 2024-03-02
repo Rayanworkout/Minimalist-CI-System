@@ -51,9 +51,13 @@ class DBWorker:
         self.__cursor.execute(
             """CREATE TABLE IF NOT EXISTS test_batches (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name UNIQUE,
                     project_id INTEGER,
-                    date TEXT DEFAULT CURRENT_TIMESTAMP,
+                    errors INTEGER DEFAULT 0,
+                    failures INTEGER DEFAULT 0,
+                    skipped INTEGER DEFAULT 0,
+                    total INTEGER DEFAULT 0,
+                    execution_time REAL DEFAULT 0,
+                    datetime TEXT,
                     FOREIGN KEY (project_id) REFERENCES projects(id)
                 )"""
         )
@@ -64,7 +68,7 @@ class DBWorker:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     test_batch_id INTEGER,
                     test_name TEXT,
-                    status TEXT,
+                    duration REAL,
                     FOREIGN KEY (test_batch_id) REFERENCES test_batches(id)
                 )"""
         )
@@ -122,20 +126,24 @@ class DBWorker:
         self.__cursor.execute("""SELECT * FROM projects WHERE id = ?""", (project_id,))
         return self.__cursor.fetchone()
 
-    def insert_test_batch(self, project_id: int, name: str = "default") -> None:
+    def insert_test_batch(self, project_id: int, batch: tuple) -> None:
         """
         Insert a test batch into the database.
 
         Params:
             project_id: the id of the project
+            batch: a tuple with the batch data (errors, failures, skipped, total, execution_time, datetime)
 
         """
-        if name == "default":
-            name = f"test_batch_{project_id}"
+
+        errors, failures = batch.get("errors", 0), batch.get("failures", 0)
+        skipped, total = batch.get("skipped", 0), batch.get("total", 0)
+        execution_time = batch.get("time", 0)
+        timestamp = batch.get("timestamp", None)
 
         self.__cursor.execute(
-            """INSERT OR IGNORE INTO test_batches (project_id, name) VALUES (?, ?)""",
-            (project_id, name),
+            """INSERT OR IGNORE INTO test_batches (project_id, errors, failures, skipped, total, execution_time, datetime) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (project_id, errors, failures, skipped, total, execution_time, timestamp),
         )
         self.__conn.commit()
 
@@ -156,7 +164,9 @@ class DBWorker:
         )
         return self.__cursor.fetchone()
 
-    def insert_test_case(self, project_id: int, test_name: str, duration: str) -> None:
+    def insert_test_case(
+        self, test_batch_id: int, test_name: str, duration: float
+    ) -> None:
         """
         Insert a test case into the database.
 
@@ -167,9 +177,9 @@ class DBWorker:
 
         """
         self.__cursor.execute(
-            """INSERT INTO test_cases (project_id, test_name, duration)
+            """INSERT INTO test_cases (test_batch_id, test_name, duration)
                 VALUES (?, ?, ?)""",
-            (project_id, test_name, duration),
+            (test_batch_id, test_name, duration),
         )
         self.__conn.commit()
 
