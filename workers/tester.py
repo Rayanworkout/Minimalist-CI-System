@@ -78,11 +78,17 @@ class Tester:
 
         # Extract the testcases
         testcases_elems = root[0].findall("testcase")
-        testcases = [
+        testcases = (
             (elem.attrib["name"], elem.attrib["time"]) for elem in testcases_elems
-        ]
+        )
 
-        print(testcases)
+        parsed_data = {
+            "project_name": project_name,
+            "test_result": test_result,
+            "testcases": testcases,
+        }
+        
+        return parsed_data
 
 
-Tester.parse_junitxml_file("MinimalistWebServer")
+
