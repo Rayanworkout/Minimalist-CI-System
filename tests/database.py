@@ -77,7 +77,7 @@ class TestDBWorker(unittest.TestCase):
             len(all_test_batch[0]), 8
         )  # id, project_id, errors, failures, skipped, total, execution_time, datetime
 
-    def test_add_testcase_to_a_batch(self):
+    def test_add_test_case_to_a_batch(self):
 
         self.db_worker.insert_project("Project 8", "test_file_8.py", "github_url_8")
 
