@@ -15,15 +15,6 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
-projects = {
-    "project1": {
-        "test_file": "test_project1.py",
-        "project_url": "",
-        "target_branch": "main",
-        "status": "idle",
-    }
-}
-
 TARGET_BRANCH = "main"
 
 
