@@ -6,7 +6,11 @@ from flask import Flask, request, render_template
 # To ensure that the payload was sent from GitHub
 from workers.webhook_validator import WebhookValidator
 
+from workers.database import DBWorker
+
 app = Flask(__name__)
+db_worker = DBWorker()
+
 
 # Configure Flask logging
 app.logger.setLevel(logging.INFO)  # Set log level to INFO
@@ -20,14 +24,13 @@ TARGET_BRANCH = "main"
 
 @app.route("/")
 def index():
-    app.logger.info("Index page visited")
     return render_template("index.html")
 
 
 @app.route("/test", methods=["POST"])
 def test():
     """
-    Flask route to trigger the test process
+    Flask route to trigger the test process.
 
     """
 
@@ -51,6 +54,28 @@ def test():
 
     else:
         return {"status": "error", "message": "Invalid signature"}
+
+
+@app.route("/add_project", methods=["POST"])
+def add_project():
+    """
+    Flask route to add a new project to the database.
+
+    """
+
+    json_body = request.json
+    targer_branch = json_body.get("target_branch", "main")
+    
+    name, test_file, github_url = (
+        json_body["name"],
+        json_body["test_file"],
+        json_body["github_url"],
+        targer_branch,
+    )
+
+    db_worker.insert_project(name, test_file, github_url, targer_branch)
+
+    return {"status": "success", "message": "project added"}
 
 
 # @app.errorhandler(500)

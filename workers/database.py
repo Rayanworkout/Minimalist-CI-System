@@ -27,7 +27,7 @@ class DBWorker:
     __instance = None
 
     # Enforcing usage of a singleton
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
         return cls.__instance
@@ -75,7 +75,7 @@ class DBWorker:
         self.__conn.commit()
 
     def insert_project(
-        self, name: str, test_file: str, github_url: str, target_branch: str = "main"
+        self, name: str, test_file: str, github_url: str, target_branch: str
     ) -> bool:
         """
         Insert a new project into the database.

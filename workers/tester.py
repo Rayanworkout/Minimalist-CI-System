@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from database import DBWorker
+
 from enums import ExitCodes
 
 import xml.etree.ElementTree as ET
@@ -19,6 +21,8 @@ class Tester:
     __bash_scripts_dir = os.path.join(__parent_dir, "bash_scripts")
 
     __test_script_path = os.path.join(__bash_scripts_dir, "run_tests.sh")
+    
+    __db_worker = DBWorker()
 
     @classmethod
     def run_test_script(
@@ -87,11 +91,27 @@ class Tester:
             "test_result": test_result,
             "testcases": testcases,
         }
-        
+
         return parsed_data
 
+    @classmethod
+    def perform_tests(cls, project_name: str, test_file: str) -> list[dict]:
+        """
+        Run tests for a specific projects.
 
+        Insert the result to the database.
 
-d = Tester.parse_junitxml_file("MinimalistWebServer")
+        """
 
-print(d)
+        # Run the test script
+        success, error_message = cls.run_test_script(project_name, test_file)
+
+        if success is False:
+            return {"status": "error", "message": error_message}
+
+        # Parse the junitxml file
+        parsed_data = cls.parse_junitxml_file(project_name)
+        
+        cls.__db_worker.insert_project(project_name)
+
+        return [parsed_data]
