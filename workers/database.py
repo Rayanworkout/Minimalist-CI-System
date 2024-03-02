@@ -27,7 +27,7 @@ class DBWorker:
     __instance = None
 
     # Enforcing usage of a singleton
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
         return cls.__instance
@@ -40,7 +40,7 @@ class DBWorker:
         self.__cursor.execute(
             """CREATE TABLE IF NOT EXISTS projects (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
+                    name TEXT UNIQUE,
                     test_file TEXT,
                     github_url TEXT,
                     target_branch TEXT
@@ -87,9 +87,9 @@ class DBWorker:
 
         """
         self.__cursor.execute(
-            """INSERT INTO projects (name, test_file, github_url, target_branch)
+            """INSERT OR IGNORE INTO projects (name, test_file, github_url, target_branch)
                 VALUES (?, ?, ?, ?)""",
-            (name, test_file, github_url, target_branch),
+            (name.lower(), test_file, github_url, target_branch),
         )
         self.__conn.commit()
 
@@ -107,19 +107,18 @@ class DBWorker:
         self.__cursor.execute("""SELECT * FROM projects WHERE name = ?""", (name,))
         return self.__cursor.fetchone()
 
-    def insert_test_batch(self, project_id: int, name: str) -> None:
+    def insert_test_batch(self, project_id: int) -> None:
         """
         Insert a test batch into the database.
 
         Params:
             project_id: the id of the project
-            name: the name of the test batch
 
         """
         self.__cursor.execute(
-            """INSERT INTO test_batches (project_id, name)
+            """INSERT INTO test_batches (project_id)
                 VALUES (?, ?)""",
-            (project_id, name),
+            (project_id,),
         )
         self.__conn.commit()
 
@@ -129,7 +128,6 @@ class DBWorker:
 
         Params:
             project_id: the id of the project
-            name: the name of the test batch
 
         Returns:
             A tuple with the test batch data
@@ -157,3 +155,10 @@ class DBWorker:
             (project_id, test_name, duration),
         )
         self.__conn.commit()
+
+    def close(self) -> None:
+        """
+        Close the connection to the database.
+
+        """
+        self.__conn.close()

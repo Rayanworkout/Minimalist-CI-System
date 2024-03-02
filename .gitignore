@@ -2,3 +2,4 @@
 .env
 projects/
 __pycache__/
+tests.sqlite3
