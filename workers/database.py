@@ -27,7 +27,7 @@ class DBWorker:
     __instance = None
 
     # Enforcing usage of a singleton
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
         return cls.__instance
@@ -75,7 +75,7 @@ class DBWorker:
         self.__conn.commit()
 
     def insert_project(
-        self, name: str, test_file: str, github_url: str, target_branch: str
+        self, name: str, test_file: str, github_url: str, target_branch: str = "main"
     ) -> bool:
         """
         Insert a new project into the database.
@@ -110,6 +110,7 @@ class DBWorker:
 
         """
         self.__cursor.execute("""SELECT * FROM projects WHERE name = ?""", (name,))
+
         return self.__cursor.fetchone()
 
     def get_project_by_id(self, project_id: int) -> tuple:
@@ -126,7 +127,7 @@ class DBWorker:
         self.__cursor.execute("""SELECT * FROM projects WHERE id = ?""", (project_id,))
         return self.__cursor.fetchone()
 
-    def insert_test_batch(self, project_id: int, batch: tuple) -> None:
+    def insert_test_batch(self, project_id: int, batch: tuple) -> int:
         """
         Insert a test batch into the database.
 
@@ -134,10 +135,14 @@ class DBWorker:
             project_id: the id of the project
             batch: a tuple with the batch data (errors, failures, skipped, total, execution_time, datetime)
 
+        Returns:
+            The id of the last inserted row to be able to insert test cases to
+            this batch.
+
         """
 
         errors, failures = batch.get("errors", 0), batch.get("failures", 0)
-        skipped, total = batch.get("skipped", 0), batch.get("total", 0)
+        skipped, total = batch.get("skipped", 0), batch.get("tests", 0)
         execution_time = batch.get("time", 0)
         timestamp = batch.get("timestamp", None)
 
@@ -146,6 +151,10 @@ class DBWorker:
             (project_id, errors, failures, skipped, total, execution_time, timestamp),
         )
         self.__conn.commit()
+
+        # Retrieve the ID of the last inserted row
+        batch_id = self.__cursor.lastrowid
+        return batch_id
 
     def get_test_batches(self, project_id: int) -> tuple:
         """
@@ -164,8 +173,8 @@ class DBWorker:
         )
         return self.__cursor.fetchall()
 
-    def insert_test_case(
-        self, test_batch_id: int, test_name: str, duration: float
+    def insert_test_cases(
+        self, test_batch_id: int, test_cases: list[(str, float)]
     ) -> None:
         """
         Insert a test case into the database.
@@ -176,11 +185,12 @@ class DBWorker:
             duration: the duration of the test
 
         """
-        self.__cursor.execute(
-            """INSERT INTO test_cases (test_batch_id, test_name, duration)
-                VALUES (?, ?, ?)""",
-            (test_batch_id, test_name, duration),
-        )
+        for test_name, duration in test_cases:
+            self.__cursor.execute(
+                """INSERT INTO test_cases (test_batch_id, test_name, duration)
+                    VALUES (?, ?, ?)""",
+                (test_batch_id, test_name, duration),
+            )
         self.__conn.commit()
 
     def get_test_cases(self, test_batch_id: int) -> tuple:

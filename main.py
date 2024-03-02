@@ -64,16 +64,16 @@ def add_project():
     """
 
     json_body = request.json
-    targer_branch = json_body.get("target_branch", "main")
+    target_branch = json_body.get("target_branch", "main")
     
     name, test_file, github_url = (
         json_body["name"],
         json_body["test_file"],
         json_body["github_url"],
-        targer_branch,
+        target_branch,
     )
 
-    db_worker.insert_project(name, test_file, github_url, targer_branch)
+    db_worker.insert_project(name, test_file, github_url, target_branch)
 
     return {"status": "success", "message": "project added"}
 

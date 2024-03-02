@@ -71,7 +71,18 @@ class ProjectManager:
         else:
             return False
 
-   
     @classmethod
-    def parse_junitxml_file(cls, project_name: str) -> None:
-        pass
+    def project_exists(cls, project_name: str) -> bool:
+        """
+        Check if a project exists.
+
+        Params:
+            project_name: name of the project
+
+        Returns:
+            True if project exists, otherwise False.
+
+        """
+        project_folder = os.path.join(cls.parent_dir, "projects", project_name)
+
+        return os.path.exists(project_folder)

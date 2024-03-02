@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from database import DBWorker
+from project_manager import ProjectManager
 
 from enums import ExitCodes
 
@@ -21,7 +22,7 @@ class Tester:
     __bash_scripts_dir = os.path.join(__parent_dir, "bash_scripts")
 
     __test_script_path = os.path.join(__bash_scripts_dir, "run_tests.sh")
-    
+
     __db_worker = DBWorker()
 
     @classmethod
@@ -45,7 +46,7 @@ class Tester:
 
         match return_code:
             case ExitCodes.SUCCESS.value:
-                return (True,)
+                return (True, "Success")
             case ExitCodes.MISSING_REQUIREMENTS.value:
                 return (False, "requirements.txt does not exist")
             case ExitCodes.MISSING_TEST_FILE.value:
@@ -86,16 +87,10 @@ class Tester:
             (elem.attrib["name"], elem.attrib["time"]) for elem in testcases_elems
         )
 
-        parsed_data = {
-            "project_name": project_name,
-            "test_result": test_result,
-            "testcases": testcases,
-        }
-
-        return parsed_data
+        return (project_name, test_result, testcases)
 
     @classmethod
-    def perform_tests(cls, project_name: str, test_file: str) -> list[dict]:
+    def perform_tests(cls, project_name: str) -> list[dict]:
         """
         Run tests for a specific projects.
 
@@ -103,15 +98,45 @@ class Tester:
 
         """
 
+        # Check if project exists in the database
+        project = cls.__db_worker.get_project(
+            project_name.lower()
+        )  # project_name is lowercased in the database
+
+        if project is None:
+            return {
+                "status": "error",
+                "message": "project not found, please add it first",
+            }
+
+        project_id = project[0]
+        test_file = project[2]
+
         # Run the test script
-        success, error_message = cls.run_test_script(project_name, test_file)
+        success, message = cls.run_test_script(project_name, test_file)
 
         if success is False:
-            return {"status": "error", "message": error_message}
+            return {"status": "error", "message": message}
 
         # Parse the junitxml file
-        parsed_data = cls.parse_junitxml_file(project_name)
-        
-        cls.__db_worker.insert_project(project_name)
+        project_name, test_result, testcases = cls.parse_junitxml_file(project_name)
 
-        return [parsed_data]
+        batch_id = cls.__db_worker.insert_test_batch(project_id, test_result)
+
+        cls.__db_worker.insert_test_cases(batch_id, list(testcases))
+
+
+if __name__ == "__main__":
+    DBWorker().insert_project(
+        "MinimalistWebServer",
+        "tests.py",
+        "https://github.com/Rayanworkout/MinimalistWebServer" "main",
+    )
+
+    if ProjectManager.project_exists("MinimalistWebServer"):
+        Tester.perform_tests("MinimalistWebServer")
+    else:
+        ProjectManager.clone_project(
+            "https://github.com/Rayanworkout/MinimalistWebServer"
+        )
+        Tester.perform_tests("MinimalistWebServer")

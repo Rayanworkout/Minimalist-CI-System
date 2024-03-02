@@ -99,7 +99,7 @@ class TestDBWorker(unittest.TestCase):
         self.assertIsNotNone(test_batches)
         self.assertEqual(len(test_batches[0]), 8)
 
-        self.db_worker.insert_test_case(test_batches[0][0], "testcase_1", 0.2)
+        self.db_worker.insert_test_cases(test_batches[0][0], "testcase_1", 0.2)
 
         testcases = self.db_worker.get_test_cases(test_batches[0][0])
 
