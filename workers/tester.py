@@ -3,6 +3,8 @@ import subprocess
 
 from enums import ExitCodes
 
+import xml.etree.ElementTree as ET
+
 
 class Tester:
     """
@@ -34,7 +36,7 @@ class Tester:
 
         """
         return_code = subprocess.call(
-            ["bash", "bash_scripts/run_tests.sh", project_name, test_file_name]
+            ["bash", cls.__test_script_path, project_name, test_file_name]
         )
 
         match return_code:
@@ -47,11 +49,40 @@ class Tester:
             case ExitCodes.VENV_CREATION_ERROR.value:
                 return (False, "Could not create venv folder.")
 
-    @staticmethod
-    def get_junitxml_file(project_name: str) -> str:
-        project_folder = os.join()
-        xml_files = [file for file in os.listdir(project_folder) if file.endswith(".xml")]
+    @classmethod
+    def get_junitxml_file(cls, project_name: str) -> str:
+
+        project_folder = os.path.join(cls.__parent_dir, "projects", project_name)
+
+        xml_files = [
+            file for file in os.listdir(project_folder) if file.endswith(".xml")
+        ]
+        # We take the first file in the list
+        test_file = xml_files[0]
+
+        test_file_path = os.path.join(project_folder, test_file)
+
+        return test_file_path
 
     @classmethod
     def parse_junitxml_file(cls, project_name: str) -> None:
-        pass
+
+        # get_junitxml_file returns both the file name and the project folder path
+        test_file_path = cls.get_junitxml_file(project_name)
+
+        tree = ET.parse(test_file_path)
+        root = tree.getroot()
+
+        # Contains errors, failures, skipped, timestamp ...
+        test_result = root[0].attrib
+
+        # Extract the testcases
+        testcases_elems = root[0].findall("testcase")
+        testcases = [
+            (elem.attrib["name"], elem.attrib["time"]) for elem in testcases_elems
+        ]
+
+        print(testcases)
+
+
+Tester.parse_junitxml_file("MinimalistWebServer")

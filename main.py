@@ -4,7 +4,7 @@ from flask import Flask, request, render_template
 
 # Function to verify the signature
 # To ensure that the payload was sent from GitHub
-from services.webhook_validator import WebhookValidator
+from workers.webhook_validator import WebhookValidator
 
 app = Flask(__name__)
 
