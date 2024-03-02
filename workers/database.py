@@ -149,7 +149,7 @@ class DBWorker:
 
     def get_test_batches(self, project_id: int) -> tuple:
         """
-        Get a test batch from the database.
+        Get all the test batches for a specified project.
 
         Params:
             project_id: the id of the project
@@ -162,7 +162,7 @@ class DBWorker:
             """SELECT * FROM test_batches WHERE project_id = ?""",
             (project_id,),
         )
-        return self.__cursor.fetchone()
+        return self.__cursor.fetchall()
 
     def insert_test_case(
         self, test_batch_id: int, test_name: str, duration: float
@@ -182,6 +182,23 @@ class DBWorker:
             (test_batch_id, test_name, duration),
         )
         self.__conn.commit()
+
+    def get_test_cases(self, test_batch_id: int) -> tuple:
+        """
+        Get all the test cases for a specified test batch.
+
+        Params:
+            test_batch_id: the id of the test batch
+
+        Returns:
+            A tuple with the test case data
+
+        """
+        self.__cursor.execute(
+            """SELECT * FROM test_cases WHERE test_batch_id = ?""",
+            (test_batch_id,),
+        )
+        return self.__cursor.fetchall()
 
     def close(self) -> None:
         """

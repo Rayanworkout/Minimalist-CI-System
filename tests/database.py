@@ -58,48 +58,54 @@ class TestDBWorker(unittest.TestCase):
 
         project = self.db_worker.get_project("project 4")
 
-        self.db_worker.insert_test_batch(project[0])  # id of the project
+        batch = {
+            "errors": 0,
+            "failures": 0,
+            "skipped": 0,
+            "total": 0,
+            "execution_time": 0.0,
+            "timestamp": "2021-10-10 10:10:10",
+        }
 
-        test_batches = self.db_worker.get_test_batches(project[0])
+        self.db_worker.insert_test_batch(project[0], batch)  # id of the project
 
-        self.assertIsNotNone(test_batches)
-        self.assertEqual(len(test_batches), 4)  # id, name and project_id
+        # Get all batches related to the project
+        all_test_batch = self.db_worker.get_test_batches(project[0])
 
-    # def test_insert_batch_with_custom_name(self):
-
-    #     project = self.db_worker.get_project_by_id(1)
-
-    #     self.db_worker.insert_test_batch(project[0], "custom_name")
-
-    #     test_batch = self.db_worker.get_test_batches(project[0])
-
-    #     self.assertIsNotNone(test_batch)
-    #     self.assertEqual(len(test_batch), 4)
-    #     self.assertEqual(test_batch[1], "custom_name")
+        self.assertIsNotNone(all_test_batch)
+        self.assertEqual(
+            len(all_test_batch[0]), 8
+        )  # id, project_id, errors, failures, skipped, total, execution_time, datetime
 
     def test_add_testcase_to_a_batch(self):
 
-        project = self.db_worker.insert_project(
-            "Project 8", "test_file_8.py", "github_url_8"
-        )
+        self.db_worker.insert_project("Project 8", "test_file_8.py", "github_url_8")
 
         project_instance = self.db_worker.get_project("project 8")
 
-        self.db_worker.insert_test_batch(project_instance[0], "test_batch")
+        batch = {
+            "errors": 0,
+            "failures": 0,
+            "skipped": 0,
+            "total": 0,
+            "time": 0.0,
+            "timestamp": "2021-10-10 10:10:10",
+        }
 
-        test_batch = self.db_worker.get_test_batches(project_instance[0])
+        self.db_worker.insert_test_batch(project_instance[0], batch)
 
-        self.assertIsNotNone(test_batch)
-        self.assertEqual(len(test_batch), 4)
-        self.assertEqual(test_batch[1], "test_batch")
+        test_batches = self.db_worker.get_test_batches(project_instance[0])
 
-        self.db_worker.insert_test_case(test_batch[0], "testcase_1", 0.2)
+        self.assertIsNotNone(test_batches)
+        self.assertEqual(len(test_batches[0]), 8)
 
-        # testcases = self.db_worker.get_testcases(test_batch[0])
+        self.db_worker.insert_test_case(test_batches[0][0], "testcase_1", 0.2)
 
-        # self.assertIsNotNone(testcases)
-        # self.assertEqual(len(testcases), 3)
-        # self.assertEqual(testcases[1], "testcase_1")
+        testcases = self.db_worker.get_test_cases(test_batches[0][0])
+
+        self.assertIsNotNone(testcases[0])
+        self.assertEqual(len(testcases[0]), 4) # id, batch_id, name, execution_time
+        self.assertEqual(testcases[0][2], "testcase_1")
 
 
 if __name__ == "__main__":
