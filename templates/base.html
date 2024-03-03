@@ -20,14 +20,14 @@
         <nav class="collapse d-lg-block sidebar collapse">
             <div class="position-sticky">
                 <div class="list-group list-group-flush mx-3 mt-3">
-                    <a href="#" class="list-group-item list-group-item-action py-3 mb-2 title text-center display-6"
+                    <a href="/" class="list-group-item list-group-item-action py-3 mb-2 title text-center display-6"
                         aria-current="true">
                         My CI
                     </a>
                     <a href="/" class="list-group-item list-group-item-action py-3 text-center fw-bold">
                         Dashboard
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action py-3 text-center fw-bold">
+                    <a href="/add_project" class="list-group-item list-group-item-action py-3 text-center fw-bold">
                         Add Project <tt>&plus;</tt>
                     </a>
                     <a href="#" class="list-group-item list-group-item-action py-3 text-center fw-bold">
@@ -37,7 +37,7 @@
             </div>
         </nav>
     </header>
-
+    {% block stats %}
     <main style="margin-top: 58px;">
         <div class="container pt-4">
             <h2 class="text-center py-2">{% block stats_type %}{% endblock %}</h2>
@@ -67,6 +67,9 @@
             {% block table %}{% endblock %}
         </div>
     </main>
+    {% endblock %}
+    {% block content %}{% endblock %}
+
 
 </body>
 

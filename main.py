@@ -32,6 +32,10 @@ def index():
 
 @app.route("/project/<int:project_id>")
 def project(project_id):
+    """
+    View that displays the project details and test statistics.
+
+    """
     db_worker = DBWorker()
     project: dict = db_worker.get_project_by_id(project_id)
     project_stats: dict = db_worker.get_project_statistics(project_id)
@@ -71,12 +75,19 @@ def test():
         return {"status": "error", "message": "Invalid signature"}
 
 
-@app.route("/add_project", methods=["POST"])
+@app.route("/add_project", methods=["GET", "POST"])
 def add_project():
     """
     Flask route to add a new project to the database.
+    
+    Displays the form to add a new project and processes the form data.
 
     """
+    
+    if request.method == 'GET':
+        return render_template("add_project.html")
+    
+    
     db_worker = DBWorker()
 
     json_body = request.json
