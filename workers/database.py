@@ -125,7 +125,18 @@ class DBWorker:
 
         """
         self.__cursor.execute("""SELECT * FROM projects WHERE id = ?""", (project_id,))
-        return self.__cursor.fetchone()
+
+        _id, name, test_file, github_url, target_branch = self.__cursor.fetchone()
+
+        project = {
+            "id": project_id,
+            "name": name.capitalize(),
+            "test_file": test_file,
+            "github_url": github_url,
+            "target_branch": target_branch,
+        }
+
+        return project
 
     def insert_test_batch(self, project_id: int, batch: tuple) -> int:
         """
@@ -167,11 +178,39 @@ class DBWorker:
             A tuple with the test batch data
 
         """
+
+        batches = []
         self.__cursor.execute(
             """SELECT * FROM test_batches WHERE project_id = ?""",
             (project_id,),
         )
-        return self.__cursor.fetchall()
+
+        for batch in self.__cursor.fetchall():
+            # Unpack the batch data
+            (
+                id_,
+                _,
+                errors,
+                failures,
+                skipped,
+                total,
+                execution_time,
+                datetime,
+            ) = batch
+
+            batches.append(
+                {
+                    "id": id_,
+                    "errors": errors,
+                    "failures": failures,
+                    "skipped": skipped,
+                    "total": total,
+                    "execution_time": execution_time,
+                    "datetime": datetime,
+                }
+            )
+
+        return batches
 
     def insert_test_cases(
         self, test_batch_id: int, test_cases: list[(str, float)]

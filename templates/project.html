@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block total_tests %}
+<h5 class="card-title">Tests</h5>
+<p class="card-text">Total tests run: {{ project.total }}</p>
+{% endblock %}
+
+{% block success_rate %}
+<h5 class="card-title">Success Rate</h5>
+<p class="card-text">{{ project.success_rate }}%</p>
+{% endblock %}
+
+{% block failures %}
+<h5 class="card-title">Failures</h5>
+<p class="card-text">Total failures: {{ project.failures }}</p>
+{% endblock %}
+
+{% block table %}
+<div class="table-responsive">
+    <div class="project-table my-5">
+        <h2 class="text-center my-3">test Batches</h2>
+        <table class="table table-striped text-center">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Errors</th>
+                    <th scope="col">Failures</th>
+                    <th scope="col">Skipped</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Exec Time</th>
+                    <th scope="col">Datetime</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for batch in test_batches %}
+                <tr>
+                    <th scope="row">{{ batch.id }}</th>
+                    <th scope="row">{{ batch.errors }}</th>
+                    <th scope="row">{{ batch.failures }}</th>
+                    <th scope="row">{{ batch.skipped }}</th>
+                    <th scope="row">{{ batch.total }}</th>
+                    <th scope="row">{{ batch.execution_time }}</th>
+                    <th scope="row">{{ batch.datetime }}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
