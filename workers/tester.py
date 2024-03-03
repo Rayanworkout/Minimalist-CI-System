@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+
 from database import DBWorker
 from project_manager import ProjectManager
 
@@ -43,7 +44,7 @@ class Tester:
         return_code = subprocess.call(
             ["bash", cls.__test_script_path, project_name, test_file_name]
         )
-        
+
         match return_code:
             case ExitCodes.SUCCESS.value:
                 return (True, "Success")

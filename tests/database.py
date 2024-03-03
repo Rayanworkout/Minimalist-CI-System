@@ -234,6 +234,45 @@ class TestDBWorker(unittest.TestCase):
         self.assertEqual(stats["success_rate"], 50)
         self.assertEqual(stats["failures"], 5)
 
+    def test_statistic_of_one_project(self):
+        # Delete all projects and batches
+        for x in range(200):
+            self.db_worker.delete_project_by_id(x)
+            self.db_worker.delete_test_batch_by_id(x)
+
+        self.db_worker.insert_project_to_database(
+            "Project 12", "test_file_12.py", "github_url_12"
+        )
+
+        project = self.db_worker.get_project("project 12")
+
+        batch_1 = {
+            "errors": 0,
+            "failures": 5,
+            "skipped": 0,
+            "tests": 10,
+            "time": 0.0,
+            "timestamp": "2024-03-03T15:34:37.859003",
+        }
+
+        batch_2 = {
+            "errors": 5,
+            "failures": 0,
+            "skipped": 0,
+            "tests": 10,
+            "time": 0.0,
+            "timestamp": "2024-03-03T15:34:37.859003",
+        }
+
+        self.db_worker.insert_test_batch(project[0], batch_1)
+        self.db_worker.insert_test_batch(project[0], batch_2)
+
+        stats = self.db_worker.get_project_statistics(project[0])
+
+        self.assertIsNotNone(stats)
+        self.assertEqual(stats["total"], 20)
+        self.assertEqual(stats["success_rate"], 50)
+        self.assertEqual(stats["failures"], 5)
 
 if __name__ == "__main__":
     unittest.main()

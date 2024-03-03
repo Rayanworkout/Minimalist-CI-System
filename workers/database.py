@@ -277,6 +277,7 @@ class DBWorker:
             """DELETE FROM test_batches WHERE id = ?""", (batch_id,)
         )
         self.__conn.commit()
+    
     ####### TEST CASES #######
     def insert_many_test_cases(
         self, test_batch_id: int, test_cases: list[(str, float)]
