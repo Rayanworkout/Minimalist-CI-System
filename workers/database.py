@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 
 class DBWorker:
@@ -74,7 +75,7 @@ class DBWorker:
         )
         self.__conn.commit()
 
-    def insert_project(
+    def insert_project_to_database(
         self, name: str, test_file: str, github_url: str, target_branch: str = "main"
     ) -> bool:
         """
@@ -112,6 +113,36 @@ class DBWorker:
         self.__cursor.execute("""SELECT * FROM projects WHERE name = ?""", (name,))
 
         return self.__cursor.fetchone()
+
+    def get_all_projects(self) -> list[dict]:
+        """
+        Get all the projects from the database.
+
+        Returns:
+            A list of dicts with all projects, and for each project:
+                - id
+                - name
+                - test_file
+                - github_url
+                - target_branch
+        """
+        projects = []
+        data = self.__cursor.execute("""SELECT * FROM projects""")
+
+        for project in data:
+            id_, name, test_file, github_url, target_branch = project
+
+            projects.append(
+                {
+                    "id": id_,
+                    "name": name.capitalize(),
+                    "test_file": test_file,
+                    "github_url": github_url,
+                    "target_branch": target_branch,
+                }
+            )
+
+        return projects
 
     def get_project_by_id(self, project_id: int) -> tuple:
         """
@@ -167,7 +198,7 @@ class DBWorker:
         batch_id = self.__cursor.lastrowid
         return batch_id
 
-    def get_test_batches(self, project_id: int) -> tuple:
+    def get_project_test_batches(self, project_id: int) -> tuple:
         """
         Get all the test batches for a specified project.
 
@@ -195,8 +226,10 @@ class DBWorker:
                 skipped,
                 total,
                 execution_time,
-                datetime,
+                batch_datetime,
             ) = batch
+
+            datetime_obj = datetime.strptime(batch_datetime, "%Y-%m-%dT%H:%M:%S.%f")
 
             batches.append(
                 {
@@ -206,13 +239,13 @@ class DBWorker:
                     "skipped": skipped,
                     "total": total,
                     "execution_time": execution_time,
-                    "datetime": datetime,
+                    "datetime": datetime_obj.strftime("%Y-%m-%d | %H:%M"),
                 }
             )
 
         return batches
 
-    def insert_test_cases(
+    def insert_test_case(
         self, test_batch_id: int, test_cases: list[(str, float)]
     ) -> None:
         """
@@ -232,7 +265,7 @@ class DBWorker:
             )
         self.__conn.commit()
 
-    def get_test_cases(self, test_batch_id: int) -> tuple:
+    def get_test_cases_of_batch(self, test_batch_id: int) -> tuple:
         """
         Get all the test cases for a specified test batch.
 
@@ -251,7 +284,7 @@ class DBWorker:
 
     def get_tests_statistics(self) -> dict:
         """
-        Get statitics about the tests.
+        Get statitics about all the tests.
 
         Returns a dict with:
             - total: the total number of tests
@@ -279,35 +312,41 @@ class DBWorker:
 
         return stats
 
-    def get_projects(self) -> list[dict]:
+    def get_project_statistics(self, project_id: int) -> dict:
         """
-        Get all the projects from the database.
+        Get statistics about a specific project.
 
-        Returns:
-            A list of dicts with all projects, and for each project:
-                - id
-                - name
-                - test_file
-                - github_url
-                - target_branch
+        Params:
+            project_id: the id of the project
+
+        Returns a dict with:
+            - total: the total number of tests
+            - success_rate: the success rate of the tests
+            - failures: the number of failed tests
+
         """
-        projects = []
-        data = self.__cursor.execute("""SELECT * FROM projects""")
+        total_tests_sum = self.__cursor.execute(
+            """SELECT SUM(total) FROM test_batches WHERE project_id = ?""",
+            (project_id,),
+        ).fetchone()[0]
 
-        for project in data:
-            id_, name, test_file, github_url, target_branch = project
+        total_tests_success_rate = self.__cursor.execute(
+            """SELECT (SUM(total - errors - failures - skipped) / SUM(total)) * 100.0 FROM test_batches WHERE project_id = ?""",
+            (project_id,),
+        ).fetchone()[0]
 
-            projects.append(
-                {
-                    "id": id_,
-                    "name": name.capitalize(),
-                    "test_file": test_file,
-                    "github_url": github_url,
-                    "target_branch": target_branch,
-                }
-            )
+        total_tests_failures = self.__cursor.execute(
+            """SELECT SUM(failures) FROM test_batches WHERE project_id = ?""",
+            (project_id,),
+        ).fetchone()[0]
 
-        return projects
+        stats = {
+            "total": total_tests_sum,
+            "success_rate": total_tests_success_rate,
+            "failures": total_tests_failures,
+        }
+
+        return stats
 
     def close(self) -> None:
         """

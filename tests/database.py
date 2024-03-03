@@ -10,8 +10,10 @@ class TestDBWorker(unittest.TestCase):
     def setUp(self):
         self.db_worker = DBWorker("tests.sqlite3")
 
-    def test_insert_project(self):
-        self.db_worker.insert_project("Project 1", "test_file_1.py", "github_url_1")
+    def test_insert_project_to_database(self):
+        self.db_worker.insert_project_to_database(
+            "Project 1", "test_file_1.py", "github_url_1"
+        )
 
         project = self.db_worker.get_project("project 1")
 
@@ -26,10 +28,12 @@ class TestDBWorker(unittest.TestCase):
         self.db_worker.close()
 
         with self.assertRaises(sqlite3.ProgrammingError):
-            self.db_worker.insert_project("Project 1", "test_file_1.py", "github_url_1")
+            self.db_worker.insert_project_to_database(
+                "Project 1", "test_file_1.py", "github_url_1"
+            )
 
     def test_insert_project_custom_branch(self):
-        self.db_worker.insert_project(
+        self.db_worker.insert_project_to_database(
             "Project 2", "test_file_2.py", "github_url_2", "develop"
         )
 
@@ -43,9 +47,13 @@ class TestDBWorker(unittest.TestCase):
         self.assertEqual(target_branch, "develop")
 
     def test_insert_project_duplicate(self):
-        self.db_worker.insert_project("Project 3", "test_file_3.py", "github_url_3")
+        self.db_worker.insert_project_to_database(
+            "Project 3", "test_file_3.py", "github_url_3"
+        )
 
-        self.db_worker.insert_project("Project 3", "test_file_3.py", "github_url_3")
+        self.db_worker.insert_project_to_database(
+            "Project 3", "test_file_3.py", "github_url_3"
+        )
 
         project = self.db_worker.get_project("project 3")
 
@@ -54,7 +62,9 @@ class TestDBWorker(unittest.TestCase):
         self.assertEqual(len(project), 5)
 
     def test_insert_test_batch(self):
-        self.db_worker.insert_project("Project 4", "test_file_4.py", "github_url_4")
+        self.db_worker.insert_project_to_database(
+            "Project 4", "test_file_4.py", "github_url_4"
+        )
 
         project = self.db_worker.get_project("project 4")
 
@@ -70,7 +80,7 @@ class TestDBWorker(unittest.TestCase):
         self.db_worker.insert_test_batch(project[0], batch)  # id of the project
 
         # Get all batches related to the project
-        all_test_batch = self.db_worker.get_test_batches(project[0])
+        all_test_batch = self.db_worker.get_project_test_batches(project[0])
 
         self.assertIsNotNone(all_test_batch)
         self.assertEqual(
@@ -79,7 +89,9 @@ class TestDBWorker(unittest.TestCase):
 
     def test_add_test_case_to_a_batch(self):
 
-        self.db_worker.insert_project("Project 8", "test_file_8.py", "github_url_8")
+        self.db_worker.insert_project_to_database(
+            "Project 8", "test_file_8.py", "github_url_8"
+        )
 
         project_instance = self.db_worker.get_project("project 8")
 
@@ -94,17 +106,17 @@ class TestDBWorker(unittest.TestCase):
 
         self.db_worker.insert_test_batch(project_instance[0], batch)
 
-        test_batches = self.db_worker.get_test_batches(project_instance[0])
+        test_batches = self.db_worker.get_project_test_batches(project_instance[0])
 
         self.assertIsNotNone(test_batches)
         self.assertEqual(len(test_batches[0]), 8)
 
-        self.db_worker.insert_test_cases(test_batches[0][0], "testcase_1", 0.2)
+        self.db_worker.insert_test_case(test_batches[0][0], "testcase_1", 0.2)
 
-        testcases = self.db_worker.get_test_cases(test_batches[0][0])
+        testcases = self.db_worker.get_test_cases_of_batch(test_batches[0][0])
 
         self.assertIsNotNone(testcases[0])
-        self.assertEqual(len(testcases[0]), 4) # id, batch_id, name, execution_time
+        self.assertEqual(len(testcases[0]), 4)  # id, batch_id, name, execution_time
         self.assertEqual(testcases[0][2], "testcase_1")
 
 

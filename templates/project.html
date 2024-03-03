@@ -20,7 +20,7 @@
 {% block table %}
 <div class="table-responsive">
     <div class="project-table my-5">
-        <h2 class="text-center my-3">test Batches</h2>
+        <h2 class="text-center my-3">Test Batches</h2>
         <table class="table table-striped text-center">
             <thead>
                 <tr>
@@ -41,7 +41,7 @@
                     <th scope="row">{{ batch.failures }}</th>
                     <th scope="row">{{ batch.skipped }}</th>
                     <th scope="row">{{ batch.total }}</th>
-                    <th scope="row">{{ batch.execution_time }}</th>
+                    <th scope="row">{{ batch.execution_time }}s</th>
                     <th scope="row">{{ batch.datetime }}</th>
                 </tr>
                 {% endfor %}
