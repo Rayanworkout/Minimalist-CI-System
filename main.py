@@ -48,6 +48,8 @@ def project(project_id):
     project_stats: dict = db_worker.get_project_statistics(project_id)
     test_batches: dict = db_worker.get_project_test_batches(project_id)
 
+    app.logger.info(f"accessed project: {project['name']}")
+
     return render_template(
         "project.html", project=project, test_batches=test_batches, stats=project_stats
     )
@@ -59,6 +61,8 @@ def test():
     Flask route to trigger the test process.
 
     """
+
+    app.logger.info("Test process triggered")
 
     json_body = request.json
     branch = json_body["ref"].split("/")[-1]
@@ -101,10 +105,11 @@ def add_project():
             request.form["branch"],
         )
         db_worker.insert_project_to_database(name, test_file, github_url, target_branch)
-        
+
         # If form submission is successful, display a success message
         flash("Project added successfully.", "success")
-        
+
+        app.logger.info(f"new project added: {name}")
         # And redirect to the index
         return redirect(url_for("index"))
 
@@ -114,6 +119,7 @@ def add_project():
 @app.route("/about", methods=["GET"])
 def about():
     return render_template("about.html")
+
 
 # @app.errorhandler(500)
 # def server_error(error):
