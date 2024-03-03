@@ -39,7 +39,7 @@
                     <th scope="row">{{ project.id }}</th>
                     <td><a href="/project/{{project.id}}">{{ project.name }}</a></td>
                     <td>{{ project.test_file }}</td>
-                    <td>{{ project.github_url }}</td>
+                    <td><a href="https://github.com/{{ project.github_url }}" target="_blank">{{ project.github_url }}</a></td>
                     <td><i>{{ project.target_branch }}</i></td>
                 </tr>
                 {% endfor %}
@@ -47,5 +47,22 @@
         </table>
     </div>
 </div>
+
+<script>
+
+    // Function to remove flash messages after a delay
+    const removeFlashMessages = () => {
+        var flashMessages = document.querySelectorAll('.alert');
+        flashMessages.forEach((message) => {
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        });
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', removeFlashMessages);
+
+</script>
 
 {% endblock %}

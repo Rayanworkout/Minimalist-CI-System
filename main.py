@@ -1,6 +1,9 @@
 import logging
+import os
 
-from flask import Flask, request, render_template
+from dotenv import load_dotenv
+
+from flask import Flask, request, render_template, flash, redirect, url_for
 
 # Function to verify the signature
 # To ensure that the payload was sent from GitHub
@@ -9,6 +12,10 @@ from workers.webhook_validator import WebhookValidator
 from workers.database import DBWorker
 
 app = Flask(__name__)
+
+# Load the environment variables
+load_dotenv()
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 
 # Configure Flask logging
@@ -79,31 +86,34 @@ def test():
 def add_project():
     """
     Flask route to add a new project to the database.
-    
+
     Displays the form to add a new project and processes the form data.
 
     """
-    
-    if request.method == 'GET':
-        return render_template("add_project.html")
-    
-    
-    db_worker = DBWorker()
 
-    json_body = request.json
-    target_branch = json_body.get("target_branch", "main")
+    if request.method == "POST":
+        db_worker = DBWorker()
 
-    name, test_file, github_url = (
-        json_body["name"],
-        json_body["test_file"],
-        json_body["github_url"],
-        target_branch,
-    )
+        name, test_file, github_url, target_branch = (
+            request.form["name"],
+            request.form["test_file"],
+            request.form["github_url"],
+            request.form["branch"],
+        )
+        db_worker.insert_project_to_database(name, test_file, github_url, target_branch)
+        
+        # If form submission is successful, display a success message
+        flash("Project added successfully.", "success")
+        
+        # And redirect to the index
+        return redirect(url_for("index"))
 
-    db_worker.insert_project_to_database(name, test_file, github_url, target_branch)
+    return render_template("add_project.html")
 
-    return {"status": "success", "message": "project added"}
 
+@app.route("/about", methods=["GET"])
+def about():
+    return render_template("about.html")
 
 # @app.errorhandler(500)
 # def server_error(error):

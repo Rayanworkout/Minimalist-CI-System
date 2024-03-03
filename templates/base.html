@@ -30,9 +30,18 @@
                     <a href="/add_project" class="list-group-item list-group-item-action py-3 text-center fw-bold">
                         Add Project <tt>&plus;</tt>
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action py-3 text-center fw-bold">
+                    <a href="/about" class="list-group-item list-group-item-action py-3 text-center fw-bold">
                         About
                     </a>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
                 </div>
             </div>
         </nav>

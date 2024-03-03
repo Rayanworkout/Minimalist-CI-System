@@ -137,7 +137,7 @@ class DBWorker:
                     "id": id_,
                     "name": name.capitalize(),
                     "test_file": test_file,
-                    "github_url": github_url,
+                    "github_url": github_url.replace("https://github.com/", ""),
                     "target_branch": target_branch,
                 }
             )
@@ -341,9 +341,14 @@ class DBWorker:
             (project_id,),
         ).fetchone()[0]
 
+        if total_tests_sum is None:
+            total_tests_sum = 0
+            total_tests_success_rate = 0
+            total_tests_failures = 0
+
         stats = {
             "total": total_tests_sum,
-            "success_rate": round(total_tests_success_rate, 2),
+            "success_rate":  round(total_tests_success_rate, 2),
             "failures": total_tests_failures,
         }
 
