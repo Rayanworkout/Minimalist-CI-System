@@ -25,9 +25,18 @@ TARGET_BRANCH = "main"
 def index():
     db_worker = DBWorker()
     statistics: dict = db_worker.get_tests_statistics()
+    all_projects: list[dict] = db_worker.get_projects()
 
-    return render_template("index.html", statistics=statistics)
+    return render_template("index.html", statistics=statistics, projects=all_projects)
 
+
+@app.route('/project/<int:project_id>')
+def project(project_id):
+    db_worker = DBWorker()
+    project = db_worker.get_project_by_id(project_id)
+    test_batches = db_worker.get_test_batches(project_id)
+
+    return render_template('project.html', project=project, test_batches=test_batches)
 
 @app.route("/test", methods=["POST"])
 def test():
@@ -87,4 +96,5 @@ def add_project():
 #     return 'Internal Server Error', 500
 
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)

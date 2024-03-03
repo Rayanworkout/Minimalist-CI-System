@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+{% block total_tests %}
+<h5 class="card-title">Tests</h5>
+<p class="card-text">Total tests run: {{ statistics.total }}</p>
+{% endblock %}
+
+{% block success_rate %}
+<h5 class="card-title">Success Rate</h5>
+<p class="card-text">{{ statistics.success_rate }}%</p>
+{% endblock %}
+
+{% block failures %}
+<h5 class="card-title">Failures</h5>
+<p class="card-text">Total failures: {{ statistics.failures }}</p>
+{% endblock %}
+
+{% block table %}
+
+
+{% endblock %}

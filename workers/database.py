@@ -240,6 +240,36 @@ class DBWorker:
 
         return stats
 
+    def get_projects(self) -> list[dict]:
+        """
+        Get all the projects from the database.
+
+        Returns:
+            A list of dicts with all projects, and for each project:
+                - id
+                - name
+                - test_file
+                - github_url
+                - target_branch
+        """
+        projects = []
+        data = self.__cursor.execute("""SELECT * FROM projects""")
+
+        for project in data:
+            id_, name, test_file, github_url, target_branch = project
+
+            projects.append(
+                {
+                    "id": id_,
+                    "name": name.capitalize(),
+                    "test_file": test_file,
+                    "github_url": github_url,
+                    "target_branch": target_branch,
+                }
+            )
+
+        return projects
+
     def close(self) -> None:
         """
         Close the connection to the database.
