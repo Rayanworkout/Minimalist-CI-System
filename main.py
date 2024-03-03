@@ -33,11 +33,13 @@ def index():
 @app.route("/project/<int:project_id>")
 def project(project_id):
     db_worker = DBWorker()
-    project: tuple = db_worker.get_project_by_id(project_id)
+    project: dict = db_worker.get_project_by_id(project_id)
     project_stats: dict = db_worker.get_project_statistics(project_id)
     test_batches: dict = db_worker.get_project_test_batches(project_id)
 
-    return render_template("project.html", project=project, test_batches=test_batches, stats=project_stats)
+    return render_template(
+        "project.html", project=project, test_batches=test_batches, stats=project_stats
+    )
 
 
 @app.route("/test", methods=["POST"])

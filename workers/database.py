@@ -144,7 +144,7 @@ class DBWorker:
 
         return projects
 
-    def get_project_by_id(self, project_id: int) -> tuple:
+    def get_project_by_id(self, project_id: int) -> dict:
         """
         Get a project from the database by its id.
 
@@ -152,7 +152,7 @@ class DBWorker:
             project_id: the id of the project
 
         Returns:
-            A tuple with the project data
+            A dict with the project data
 
         """
         self.__cursor.execute("""SELECT * FROM projects WHERE id = ?""", (project_id,))
@@ -198,7 +198,7 @@ class DBWorker:
         batch_id = self.__cursor.lastrowid
         return batch_id
 
-    def get_project_test_batches(self, project_id: int) -> tuple:
+    def get_project_test_batches(self, project_id: int) -> dict:
         """
         Get all the test batches for a specified project.
 
@@ -206,7 +206,7 @@ class DBWorker:
             project_id: the id of the project
 
         Returns:
-            A tuple with the test batch data
+            A dict with the test batch data for the specified project.
 
         """
 
@@ -296,8 +296,9 @@ class DBWorker:
             """SELECT SUM(total) FROM test_batches"""
         ).fetchone()[0]
 
+        # Cast to real to have float division
         total_tests_success_rate = self.__cursor.execute(
-            """SELECT (SUM(total - errors - failures - skipped) / SUM(total)) * 100.0 FROM test_batches"""
+            """SELECT (CAST(SUM(total - errors - failures - skipped) AS REAL) / SUM(total)) * 100 FROM test_batches"""
         ).fetchone()[0]
 
         total_tests_failures = self.__cursor.execute(
@@ -306,7 +307,7 @@ class DBWorker:
 
         stats = {
             "total": total_tests_sum,
-            "success_rate": total_tests_success_rate,
+            "success_rate": round(total_tests_success_rate, 2),
             "failures": total_tests_failures,
         }
 
@@ -331,7 +332,7 @@ class DBWorker:
         ).fetchone()[0]
 
         total_tests_success_rate = self.__cursor.execute(
-            """SELECT (SUM(total - errors - failures - skipped) / SUM(total)) * 100.0 FROM test_batches WHERE project_id = ?""",
+            """SELECT (CAST(SUM(total - errors - failures - skipped) AS REAL) / SUM(total)) * 100 FROM test_batches WHERE project_id = ?""",
             (project_id,),
         ).fetchone()[0]
 
@@ -342,7 +343,7 @@ class DBWorker:
 
         stats = {
             "total": total_tests_sum,
-            "success_rate": total_tests_success_rate,
+            "success_rate": round(total_tests_success_rate, 2),
             "failures": total_tests_failures,
         }
 

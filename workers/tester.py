@@ -43,10 +43,12 @@ class Tester:
         return_code = subprocess.call(
             ["bash", cls.__test_script_path, project_name, test_file_name]
         )
-
+        
         match return_code:
             case ExitCodes.SUCCESS.value:
                 return (True, "Success")
+            case ExitCodes.ERROR_EXIT.value:
+                return (True, "Success with some errors")
             case ExitCodes.MISSING_REQUIREMENTS.value:
                 return (False, "requirements.txt does not exist")
             case ExitCodes.MISSING_TEST_FILE.value:

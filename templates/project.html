@@ -2,19 +2,21 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
+{% block stats_type %}{{ project.name }}{% endblock %}
+
 {% block total_tests %}
 <h5 class="card-title">Tests</h5>
-<p class="card-text">Total tests run: {{ project.total }}</p>
+<p class="card-text">Total tests: {{ stats.total }}</p>
 {% endblock %}
 
 {% block success_rate %}
 <h5 class="card-title">Success Rate</h5>
-<p class="card-text">{{ project.success_rate }}%</p>
+<p class="card-text">{{ stats.success_rate }}%</p>
 {% endblock %}
 
 {% block failures %}
 <h5 class="card-title">Failures</h5>
-<p class="card-text">Total failures: {{ project.failures }}</p>
+<p class="card-text">Total failures: {{ stats.failures }}</p>
 {% endblock %}
 
 {% block table %}
