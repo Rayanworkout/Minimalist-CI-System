@@ -35,7 +35,7 @@ def index():
     db_worker = DBWorker()
     statistics: dict = db_worker.get_tests_statistics()
     all_projects: list[dict] = db_worker.get_all_projects()
-    
+
     return render_template("index.html", statistics=statistics, projects=all_projects)
 
 
@@ -107,12 +107,16 @@ def add_project():
             request.form["github_url"],
             request.form["branch"],
         )
-        
+
+        name = name.lower()  # Project name is lowercase inside the database
+
         if not db_worker.project_exists(name):
             if not ProjectManager.project_exists(github_url):
                 ProjectManager.clone_project(github_url)
-        
-            db_worker.insert_project_to_database(name, test_file, github_url, target_branch)
+
+            db_worker.insert_project_to_database(
+                name, test_file, github_url, target_branch
+            )
 
             # If form submission is successful, display a success message
             flash("Project added successfully.", "success")
@@ -121,7 +125,8 @@ def add_project():
             # And redirect to the index
             return redirect(url_for("index"))
         else:
-            flash("Project already exists.", "error")
+            flash("Project already exists.", "danger")
+            app.logger.info(f"project already exists: {name}")
             return redirect(url_for("add_project"))
 
     return render_template("add_project.html")

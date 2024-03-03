@@ -274,5 +274,14 @@ class TestDBWorker(unittest.TestCase):
         self.assertEqual(stats["success_rate"], 50)
         self.assertEqual(stats["failures"], 5)
 
+    def test_project_exists_method_works(self):
+        self.db_worker.insert_project_to_database(
+            "Project 13", "test_file_13.py", "github_url_13"
+        )
+        
+        self.assertTrue(self.db_worker.project_exists("project 13"))
+        self.assertFalse(self.db_worker.project_exists("project 14"))
+
+
 if __name__ == "__main__":
     unittest.main()
