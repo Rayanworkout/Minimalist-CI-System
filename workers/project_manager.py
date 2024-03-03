@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from enums import ExitCodes
+from workers.enums import ExitCodes
 
 
 class ProjectManager:

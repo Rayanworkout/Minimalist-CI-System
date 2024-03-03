@@ -185,6 +185,21 @@ class DBWorker:
         self.__cursor.execute("""DELETE FROM projects WHERE id = ?""", (project_id,))
         self.__conn.commit()
 
+    def project_exists(self, name: str) -> bool:
+        """
+        Check if a project exists in the database.
+
+        Params:
+            name: the name of the project
+
+        Returns:
+            True if the project exists
+            False otherwise
+
+        """
+        self.__cursor.execute("""SELECT * FROM projects WHERE name = ?""", (name,))
+        return self.__cursor.fetchone() is not None
+
     ####### BATCHES #######
     def insert_test_batch(self, project_id: int, batch: tuple) -> int:
         """
@@ -210,7 +225,7 @@ class DBWorker:
             (project_id, errors, failures, skipped, total, execution_time, timestamp),
         )
         self.__conn.commit()
-        
+
         # Retrieve the ID of the last inserted row
         batch_id = self.__cursor.lastrowid
         return batch_id
@@ -273,11 +288,9 @@ class DBWorker:
             batch_id: the id of the project
 
         """
-        self.__cursor.execute(
-            """DELETE FROM test_batches WHERE id = ?""", (batch_id,)
-        )
+        self.__cursor.execute("""DELETE FROM test_batches WHERE id = ?""", (batch_id,))
         self.__conn.commit()
-    
+
     ####### TEST CASES #######
     def insert_many_test_cases(
         self, test_batch_id: int, test_cases: list[(str, float)]

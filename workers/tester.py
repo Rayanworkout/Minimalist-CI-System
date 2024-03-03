@@ -2,10 +2,8 @@ import os
 import subprocess
 
 
-from database import DBWorker
-from project_manager import ProjectManager
-
-from enums import ExitCodes
+from workers.database import DBWorker
+from workers.enums import ExitCodes
 
 import xml.etree.ElementTree as ET
 
@@ -127,19 +125,3 @@ class Tester:
         batch_id = cls.__db_worker.insert_test_batch(project_id, test_result)
 
         cls.__db_worker.insert_many_test_cases(batch_id, list(testcases))
-
-
-if __name__ == "__main__":
-    DBWorker().insert_project_to_database(
-        "MinimalistWebServer",
-        "tests.py",
-        "https://github.com/Rayanworkout/MinimalistWebServer" "main",
-    )
-
-    if ProjectManager.project_exists("MinimalistWebServer"):
-        Tester.perform_tests("MinimalistWebServer")
-    else:
-        ProjectManager.clone_project(
-            "https://github.com/Rayanworkout/MinimalistWebServer"
-        )
-        Tester.perform_tests("MinimalistWebServer")

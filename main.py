@@ -10,6 +10,8 @@ from flask import Flask, request, render_template, flash, redirect, url_for
 from workers.webhook_validator import WebhookValidator
 
 from workers.database import DBWorker
+from workers.project_manager import ProjectManager
+from workers.tester import Tester
 
 app = Flask(__name__)
 
@@ -78,7 +80,8 @@ def test():
         signature_header=secret_header,
     ):
 
-        # Call the test script
+        ProjectManager.pull_latest_changes()
+        Tester.perform_tests()
 
         return {"status": "success", "message": "test process triggered"}
 
@@ -104,14 +107,22 @@ def add_project():
             request.form["github_url"],
             request.form["branch"],
         )
-        db_worker.insert_project_to_database(name, test_file, github_url, target_branch)
+        
+        if not db_worker.project_exists(name):
+            if not ProjectManager.project_exists(github_url):
+                ProjectManager.clone_project(github_url)
+        
+            db_worker.insert_project_to_database(name, test_file, github_url, target_branch)
 
-        # If form submission is successful, display a success message
-        flash("Project added successfully.", "success")
+            # If form submission is successful, display a success message
+            flash("Project added successfully.", "success")
 
-        app.logger.info(f"new project added: {name}")
-        # And redirect to the index
-        return redirect(url_for("index"))
+            app.logger.info(f"new project added: {name}")
+            # And redirect to the index
+            return redirect(url_for("index"))
+        else:
+            flash("Project already exists.", "error")
+            return redirect(url_for("add_project"))
 
     return render_template("add_project.html")
 
