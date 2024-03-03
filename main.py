@@ -33,7 +33,7 @@ def index():
     db_worker = DBWorker()
     statistics: dict = db_worker.get_tests_statistics()
     all_projects: list[dict] = db_worker.get_all_projects()
-
+    
     return render_template("index.html", statistics=statistics, projects=all_projects)
 
 

@@ -125,12 +125,15 @@ class DBWorker:
                 - test_file
                 - github_url
                 - target_branch
+                - last_batch
         """
         projects = []
         data = self.__cursor.execute("""SELECT * FROM projects""")
 
-        for project in data:
+        for project in data.fetchall():
             id_, name, test_file, github_url, target_branch = project
+
+            last_batch = self.get_project_test_batches(id_)[0]
 
             projects.append(
                 {
@@ -139,6 +142,7 @@ class DBWorker:
                     "test_file": test_file,
                     "github_url": github_url.replace("https://github.com/", ""),
                     "target_branch": target_branch,
+                    "last_batch": last_batch["datetime"],
                 }
             )
 
@@ -157,7 +161,7 @@ class DBWorker:
         """
         self.__cursor.execute("""SELECT * FROM projects WHERE id = ?""", (project_id,))
 
-        _id, name, test_file, github_url, target_branch = self.__cursor.fetchone()
+        _, name, test_file, github_url, target_branch = self.__cursor.fetchone()
 
         project = {
             "id": project_id,
@@ -206,7 +210,7 @@ class DBWorker:
             project_id: the id of the project
 
         Returns:
-            A dict with the test batch data for the specified project.
+            A dict with the test batch data for the specified project, sorted by datetime.
 
         """
 
@@ -238,12 +242,15 @@ class DBWorker:
                     "failures": failures,
                     "skipped": skipped,
                     "total": total,
-                    "execution_time": execution_time,
+                    "execution_time": str(execution_time) + " s",
                     "datetime": datetime_obj.strftime("%Y-%m-%d | %H:%M"),
                 }
             )
 
-        return batches
+        # Sort the batches by datetime
+        batches = sorted(batches, key=lambda x: x["datetime"], reverse=True)
+
+        return batches if batches else [{"datetime": "No tests yet."}]
 
     def insert_test_case(
         self, test_batch_id: int, test_cases: list[(str, float)]
@@ -348,7 +355,7 @@ class DBWorker:
 
         stats = {
             "total": total_tests_sum,
-            "success_rate":  round(total_tests_success_rate, 2),
+            "success_rate": round(total_tests_success_rate, 2),
             "failures": total_tests_failures,
         }
 

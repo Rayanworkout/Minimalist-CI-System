@@ -31,6 +31,7 @@
                     <th scope="col">Test File</th>
                     <th scope="col">Github URL</th>
                     <th scope="col">Target Branch</th>
+                    <th scope="col">Last Batch</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,6 +42,7 @@
                     <td>{{ project.test_file }}</td>
                     <td><a href="https://github.com/{{ project.github_url }}" target="_blank">{{ project.github_url }}</a></td>
                     <td><i>{{ project.target_branch }}</i></td>
+                    <td>{{ project.last_batch }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
