@@ -210,6 +210,36 @@ class DBWorker:
         )
         return self.__cursor.fetchall()
 
+    def get_tests_statistics(self) -> dict:
+        """
+        Get statitics about the tests.
+
+        Returns a dict with:
+            - total: the total number of tests
+            - success_rate: the success rate of the tests
+            - failures: the number of failed tests
+
+        """
+        total_tests_sum = self.__cursor.execute(
+            """SELECT SUM(total) FROM test_batches"""
+        ).fetchone()[0]
+
+        total_tests_success_rate = self.__cursor.execute(
+            """SELECT (SUM(total - errors - failures - skipped) / SUM(total)) * 100.0 FROM test_batches"""
+        ).fetchone()[0]
+
+        total_tests_failures = self.__cursor.execute(
+            """SELECT SUM(failures) FROM test_batches"""
+        ).fetchone()[0]
+
+        stats = {
+            "total": total_tests_sum,
+            "success_rate": total_tests_success_rate,
+            "failures": total_tests_failures,
+        }
+
+        return stats
+
     def close(self) -> None:
         """
         Close the connection to the database.

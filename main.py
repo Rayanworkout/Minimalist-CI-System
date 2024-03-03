@@ -9,7 +9,6 @@ from workers.webhook_validator import WebhookValidator
 from workers.database import DBWorker
 
 app = Flask(__name__)
-db_worker = DBWorker()
 
 
 # Configure Flask logging
@@ -24,7 +23,10 @@ TARGET_BRANCH = "main"
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    db_worker = DBWorker()
+    statistics: dict = db_worker.get_tests_statistics()
+
+    return render_template("index.html", statistics=statistics)
 
 
 @app.route("/test", methods=["POST"])
@@ -62,10 +64,11 @@ def add_project():
     Flask route to add a new project to the database.
 
     """
+    db_worker = DBWorker()
 
     json_body = request.json
     target_branch = json_body.get("target_branch", "main")
-    
+
     name, test_file, github_url = (
         json_body["name"],
         json_body["test_file"],
@@ -84,4 +87,4 @@ def add_project():
 #     return 'Internal Server Error', 500
 
 
-app.run()
+app.run(debug=True)
