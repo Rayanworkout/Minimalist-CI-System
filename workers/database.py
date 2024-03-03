@@ -75,6 +75,7 @@ class DBWorker:
         )
         self.__conn.commit()
 
+    ####### PROJECTS #######
     def insert_project_to_database(
         self, name: str, test_file: str, github_url: str, target_branch: str = "main"
     ) -> bool:
@@ -173,6 +174,18 @@ class DBWorker:
 
         return project
 
+    def delete_project_by_id(self, project_id: str) -> None:
+        """
+        Delete a project from the database by its id.
+
+        Params:
+            name: the name of the project
+
+        """
+        self.__cursor.execute("""DELETE FROM projects WHERE id = ?""", (project_id,))
+        self.__conn.commit()
+
+    ####### BATCHES #######
     def insert_test_batch(self, project_id: int, batch: tuple) -> int:
         """
         Insert a test batch into the database.
@@ -197,7 +210,7 @@ class DBWorker:
             (project_id, errors, failures, skipped, total, execution_time, timestamp),
         )
         self.__conn.commit()
-
+        
         # Retrieve the ID of the last inserted row
         batch_id = self.__cursor.lastrowid
         return batch_id
@@ -252,6 +265,19 @@ class DBWorker:
 
         return batches if batches else [{"datetime": "No tests yet."}]
 
+    def delete_test_batch_by_id(self, batch_id: int) -> None:
+        """
+        Delete a test batch from the database by its id.
+
+        Params:
+            batch_id: the id of the project
+
+        """
+        self.__cursor.execute(
+            """DELETE FROM test_batches WHERE id = ?""", (batch_id,)
+        )
+        self.__conn.commit()
+    ####### TEST CASES #######
     def insert_many_test_cases(
         self, test_batch_id: int, test_cases: list[(str, float)]
     ) -> None:
@@ -289,6 +315,7 @@ class DBWorker:
         )
         return self.__cursor.fetchall()
 
+    ####### STATISTICS #######
     def get_tests_statistics(self) -> dict:
         """
         Get statitics about all the tests.
@@ -311,6 +338,11 @@ class DBWorker:
         total_tests_failures = self.__cursor.execute(
             """SELECT SUM(failures) FROM test_batches"""
         ).fetchone()[0]
+
+        if total_tests_sum in (None, 0):
+            total_tests_sum = 0
+            total_tests_success_rate = 0
+            total_tests_failures = 0
 
         stats = {
             "total": total_tests_sum,
