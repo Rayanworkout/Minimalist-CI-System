@@ -61,6 +61,21 @@ class TestDBWorker(unittest.TestCase):
 
         self.assertEqual(len(project), 5)
 
+    def test_get_all_projects(self):
+        
+        self.db_worker.insert_project_to_database(
+            "Project 4", "test_file_4.py", "github_url_4"
+        )
+
+        self.db_worker.insert_project_to_database(
+            "Project 5", "test_file_5.py", "github_url_5"
+        )
+
+        all_projects = self.db_worker.get_all_projects()
+
+        self.assertIsNotNone(all_projects)
+        self.assertEqual(len(all_projects), 3)
+    
     def test_insert_test_batch(self):
         self.db_worker.insert_project_to_database(
             "Project 4", "test_file_4.py", "github_url_4"

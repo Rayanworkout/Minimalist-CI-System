@@ -2,7 +2,7 @@
 
 _This project is currently under development._
 
-This small yet robust CI system can be deployed on your server to run tests, and monitor the results. It is designed to be simple to understand and easy to extend. Every part of the system is modular and can be replaced with a different implementation. Every function is well documented and easy to understand.
+This small yet robust self hosted CI system can be deployed on your server to run tests, and monitor the results. It is designed to be simple to understand and easy to extend. Every part of the system is modular and can be replaced with a different implementation. Every function is well documented and easy to understand.
 
 The workflow is the following:
 
