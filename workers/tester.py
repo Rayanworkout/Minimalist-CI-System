@@ -125,7 +125,7 @@ class Tester:
 
         batch_id = cls.__db_worker.insert_test_batch(project_id, test_result)
 
-        cls.__db_worker.insert_test_case(batch_id, list(testcases))
+        cls.__db_worker.insert_many_test_cases(batch_id, list(testcases))
 
 
 if __name__ == "__main__":

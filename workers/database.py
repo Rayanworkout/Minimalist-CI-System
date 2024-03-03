@@ -252,11 +252,11 @@ class DBWorker:
 
         return batches if batches else [{"datetime": "No tests yet."}]
 
-    def insert_test_case(
+    def insert_many_test_cases(
         self, test_batch_id: int, test_cases: list[(str, float)]
     ) -> None:
         """
-        Insert a test case into the database.
+        Insert multiple test cases to a batch of tests.
 
         Params:
             project_id: the id of the project

@@ -74,7 +74,7 @@ class TestDBWorker(unittest.TestCase):
             "skipped": 0,
             "total": 0,
             "execution_time": 0.0,
-            "timestamp": "2021-10-10 10:10:10",
+            "timestamp": "2024-03-03T15:34:37.859003",
         }
 
         self.db_worker.insert_test_batch(project[0], batch)  # id of the project
@@ -84,7 +84,7 @@ class TestDBWorker(unittest.TestCase):
 
         self.assertIsNotNone(all_test_batch)
         self.assertEqual(
-            len(all_test_batch[0]), 8
+            len(all_test_batch[0]), 7
         )  # id, project_id, errors, failures, skipped, total, execution_time, datetime
 
     def test_add_test_case_to_a_batch(self):
@@ -101,7 +101,7 @@ class TestDBWorker(unittest.TestCase):
             "skipped": 0,
             "total": 0,
             "time": 0.0,
-            "timestamp": "2021-10-10 10:10:10",
+            "timestamp": "2024-03-03T15:34:37.859003",
         }
 
         self.db_worker.insert_test_batch(project_instance[0], batch)
@@ -109,11 +109,12 @@ class TestDBWorker(unittest.TestCase):
         test_batches = self.db_worker.get_project_test_batches(project_instance[0])
 
         self.assertIsNotNone(test_batches)
-        self.assertEqual(len(test_batches[0]), 8)
+        self.assertEqual(len(test_batches[0]), 7)
+        
 
-        self.db_worker.insert_test_case(test_batches[0][0], "testcase_1", 0.2)
+        self.db_worker.insert_many_test_cases(test_batches[0]["id"], [("testcase_1", 0.2)])
 
-        testcases = self.db_worker.get_test_cases_of_batch(test_batches[0][0])
+        testcases = self.db_worker.get_test_cases_of_batch(test_batches[0]['id'])
 
         self.assertIsNotNone(testcases[0])
         self.assertEqual(len(testcases[0]), 4)  # id, batch_id, name, execution_time
