@@ -30,6 +30,13 @@ app.logger.addHandler(handler)
 TARGET_BRANCH = "main"
 
 
+# TODO handle target branch according to database
+# Handle test file in folder
+# Handle project name from github delivery
+# Handle private repositories
+# Check if a project in database also exists as a folder at every start
+
+
 @app.route("/")
 def index():
     db_worker = DBWorker()
@@ -68,6 +75,8 @@ def test():
 
     json_body = request.json
     branch = json_body["ref"].split("/")[-1]
+
+    print(json_body)
 
     if branch != TARGET_BRANCH:
         return {"status": "success", "message": "not target branch"}
@@ -110,7 +119,9 @@ def add_project():
 
         name = name.lower()  # Project name is lowercase inside the database
 
+        # Project does not exist in DB
         if not db_worker.project_exists(name):
+            # project hasn't been cloned yet
             if not ProjectManager.project_exists(github_url):
                 ProjectManager.clone_project(github_url)
 
@@ -144,4 +155,4 @@ def about():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

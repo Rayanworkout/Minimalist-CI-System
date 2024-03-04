@@ -343,7 +343,7 @@ class DBWorker:
         total_tests_sum = self.__cursor.execute(
             """SELECT SUM(total) FROM test_batches"""
         ).fetchone()[0]
-
+        
         # Cast to real to have float division
         total_tests_success_rate = self.__cursor.execute(
             """SELECT (CAST(SUM(total - errors - failures - skipped) AS REAL) / SUM(total)) * 100 FROM test_batches"""
@@ -353,7 +353,7 @@ class DBWorker:
             """SELECT SUM(failures) FROM test_batches"""
         ).fetchone()[0]
 
-        if total_tests_sum in (None, 0):
+        if total_tests_sum is None: # If there are no tests at all
             total_tests_sum = 0
             total_tests_success_rate = 0
             total_tests_failures = 0
@@ -383,7 +383,7 @@ class DBWorker:
             """SELECT SUM(total) FROM test_batches WHERE project_id = ?""",
             (project_id,),
         ).fetchone()[0]
-
+        
         total_tests_success_rate = self.__cursor.execute(
             """SELECT (CAST(SUM(total - errors - failures - skipped) AS REAL) / SUM(total)) * 100 FROM test_batches WHERE project_id = ?""",
             (project_id,),
@@ -394,7 +394,7 @@ class DBWorker:
             (project_id,),
         ).fetchone()[0]
 
-        if total_tests_sum is None:
+        if total_tests_sum is None: # If there are no tests for this project
             total_tests_sum = 0
             total_tests_success_rate = 0
             total_tests_failures = 0
