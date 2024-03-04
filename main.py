@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 
@@ -155,4 +156,18 @@ def about():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True)
+
+    parser = argparse.ArgumentParser(description="Simple Continuous Integration Server")
+    # Port
+    parser.add_argument(
+        "--port", type=int, default=8080, help="Port number for the server"
+    )
+
+    # Host
+    parser.add_argument(
+        "--host", type=str, default="127.0.0.1", help="Host address for the server"
+    )
+
+    args = parser.parse_args()
+
+    app.run(debug=True, threaded=True, host=args.host, port=args.port)
