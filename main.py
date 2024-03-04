@@ -36,6 +36,10 @@ TARGET_BRANCH = "main"
 # Handle project name from github delivery
 # Handle private repositories
 # Check if a project in database also exists as a folder at every start
+# Get repo name from url and not user input
+# Enable user to delete project (ProjectManager.delete_project)
+# Monitor when project is not cloned (bad url)
+# Monitor if a project is well deleted (projectManager.delete_project and database.delete_project_by_name)
 
 
 @app.route("/")
@@ -142,6 +146,24 @@ def add_project():
             return redirect(url_for("add_project"))
 
     return render_template("add_project.html")
+
+
+@app.route("/delete_project/<string:project_name>", methods=["GET"])
+def delete_project(project_name):
+    """
+    Flask route to delete a project folder and from the database.
+
+    """
+
+    db_worker = DBWorker()
+    db_worker.delete_project_by_name(project_name)
+
+    ProjectManager.delete_project_folder(project_name)
+
+    app.logger.info(f"project deleted: {project_name}")
+
+    flash("Project deleted successfully.", "success")
+    return redirect(url_for("index"))
 
 
 @app.route("/about", methods=["GET"])

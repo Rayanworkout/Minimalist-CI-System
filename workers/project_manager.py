@@ -86,3 +86,28 @@ class ProjectManager:
         project_folder = os.path.join(cls.parent_dir, "projects", project_name)
 
         return os.path.exists(project_folder)
+
+    
+    @classmethod
+    def delete_project_folder(cls, project_name: str) -> bool:
+        """
+        Delete a project.
+
+        Params:
+            project_name: name of the project
+
+        Returns:
+            True if project was deleted, otherwise False.
+
+        """
+        project_folder = os.path.join(cls.parent_dir, "projects", project_name)
+
+        if os.path.exists(project_folder):
+            return_code = subprocess.call(["rm", "-rf", project_folder])
+
+            if return_code == ExitCodes.SUCCESS.value:
+                return True
+            else:
+                return False
+        else:
+            return False

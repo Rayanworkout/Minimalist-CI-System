@@ -2,7 +2,10 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
-{% block stats_type %}{{ project.name }}{% endblock %}
+{% block stats_type %}{{ project.name }}
+
+<a href="/delete_project/{{ project.name }}" class="btn btn-danger">Delete</a>
+{% endblock %}
 
 {% block total_tests %}
 <h5 class="card-title">Tests</h5>
