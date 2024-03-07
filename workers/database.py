@@ -93,12 +93,14 @@ class DBWorker:
             False otherwise
 
         """
-        self.__cursor.execute(
+        success = self.__cursor.execute(
             """INSERT OR IGNORE INTO projects (name, test_file, github_url, target_branch)
                 VALUES (?, ?, ?, ?)""",
             (name.lower(), test_file, github_url, target_branch),
         )
         self.__conn.commit()
+
+        return success.rowcount > 0
 
     def get_project(self, name: str) -> tuple:
         """

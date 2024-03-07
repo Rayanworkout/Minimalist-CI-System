@@ -39,7 +39,6 @@ TARGET_BRANCH = "main"
 # Get repo name from url and not user input
 
 # Monitor when project is not cloned (bad url)
-# Monitor if a project is well deleted (projectManager.delete_project and database.delete_project_by_name)
 
 
 @app.route("/")
@@ -124,25 +123,34 @@ def add_project():
 
         name = name.lower()  # Project name is lowercase inside the database
 
-        # Project does not exist in DB
-        if not db_worker.project_exists(name):
-            # project hasn't been cloned yet
-            if not ProjectManager.project_exists(github_url):
-                ProjectManager.clone_project(github_url)
+        project_exists_in_db = db_worker.project_exists(name)
+        project_exists_in_folder = ProjectManager.project_exists(name)
 
-            db_worker.insert_project_to_database(
+        # Project does not exist in DB and hasn't been cloned yet
+        if not project_exists_in_db and not project_exists_in_folder:
+            clone_success: bool = ProjectManager.clone_project(github_url)
+
+            db_insert_success = db_worker.insert_project_to_database(
                 name, test_file, github_url, target_branch
             )
 
-            # If form submission is successful, display a success message
-            flash("Project added successfully.", "success")
+            if clone_success and db_insert_success:
+                # If form submission is successful, display a success message
+                flash("Project added successfully.", "success")
 
-            app.logger.info(f"new project added: {name}")
-            # And redirect to the index
-            return redirect(url_for("index"))
+                app.logger.info(f"new project added: {name}")
+                # And redirect to the index
+                return redirect(url_for("index"))
+            else:
+                issue = "folder" if not clone_success else "database"
+                flash(f"Project could not be added to {issue}.", "danger")
+                app.logger.error(f"project could not be added to {issue}: {name}")
+                return redirect(url_for("add_project"))
+
         else:
-            flash("Project already exists.", "danger")
-            app.logger.info(f"project already exists: {name}")
+            existing = "database" if project_exists_in_db else "folder"
+            flash(f"Project already exists in {existing}.", "danger")
+            app.logger.error(f"project already exists in {existing}: {name}")
             return redirect(url_for("add_project"))
 
     return render_template("add_project.html")
