@@ -37,6 +37,7 @@ TARGET_BRANCH = "main"
 # Handle private repositories
 # Check if a project in database also exists as a folder at every start
 # Get repo name from url and not user input
+
 # Monitor when project is not cloned (bad url)
 # Monitor if a project is well deleted (projectManager.delete_project and database.delete_project_by_name)
 
@@ -155,14 +156,20 @@ def delete_project(project_name):
     """
 
     db_worker = DBWorker()
-    db_worker.delete_project_by_name(project_name)
+    db_deleted_successfully: bool = db_worker.delete_project_by_name(project_name)
+    folder_deleted_successfully = ProjectManager.delete_project_folder(project_name)
 
-    ProjectManager.delete_project_folder(project_name)
+    if db_deleted_successfully and folder_deleted_successfully:
+        flash("Project deleted successfully.", "success")
 
-    app.logger.info(f"project deleted: {project_name}")
+        app.logger.info(f"project deleted: {project_name}")
 
-    flash("Project deleted successfully.", "success")
-    return redirect(url_for("index"))
+        return redirect(url_for("index"))
+
+    else:
+        flash("Project could not be deleted.", "danger")
+        app.logger.error(f"project could not be deleted: {project_name}")
+        return redirect(url_for("index"))
 
 
 @app.route("/about", methods=["GET"])

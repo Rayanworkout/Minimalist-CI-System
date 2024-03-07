@@ -40,7 +40,7 @@ class ProjectManager:
             [
                 "bash",
                 cls.clone_script_path,
-                project_name,
+                project_name.lower(),  # Folder name + project in database are lowercase
                 project_url,
             ]
         )
@@ -87,7 +87,6 @@ class ProjectManager:
 
         return os.path.exists(project_folder)
 
-    
     @classmethod
     def delete_project_folder(cls, project_name: str) -> bool:
         """
@@ -100,6 +99,7 @@ class ProjectManager:
             True if project was deleted, otherwise False.
 
         """
+        project_name = project_name.lower()
         project_folder = os.path.join(cls.parent_dir, "projects", project_name)
 
         if os.path.exists(project_folder):

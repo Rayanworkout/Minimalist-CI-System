@@ -185,16 +185,24 @@ class DBWorker:
         self.__cursor.execute("""DELETE FROM projects WHERE id = ?""", (project_id,))
         self.__conn.commit()
 
-    def delete_project_by_name(self, name: str) -> None:
+    def delete_project_by_name(self, name: str) -> bool:
         """
         Delete a project from the database by its name.
 
         Params:
             name: the name of the project
 
+        Returns:
+            True if the project was deleted successfully
+            False otherwise
+
         """
-        self.__cursor.execute("""DELETE FROM projects WHERE name = ?""", (name,))
+        name = name.lower()
+        success = self.__cursor.execute("""DELETE FROM projects WHERE name = ?""", (name,))
         self.__conn.commit()
+
+        return success.rowcount > 0
+        
 
     def project_exists(self, name: str) -> bool:
         """
