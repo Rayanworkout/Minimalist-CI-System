@@ -38,9 +38,6 @@ TARGET_BRANCH = "main"
 # Check if a project in database also exists as a folder at every start
 # Get repo name from url and not user input
 
-# Monitor when project is not cloned (bad url)
-
-
 @app.route("/")
 def index():
     db_worker = DBWorker()
@@ -128,6 +125,7 @@ def add_project():
 
         # Project does not exist in DB and hasn't been cloned yet
         if not project_exists_in_db and not project_exists_in_folder:
+            
             clone_success: bool = ProjectManager.clone_project(github_url)
 
             db_insert_success = db_worker.insert_project_to_database(
@@ -143,6 +141,11 @@ def add_project():
                 return redirect(url_for("index"))
             else:
                 issue = "folder" if not clone_success else "database"
+
+                # One of the operations failed, so I delete both
+                db_worker.delete_project_by_name(name)
+                ProjectManager.delete_project_folder(name)
+
                 flash(f"Project could not be added to {issue}.", "danger")
                 app.logger.error(f"project could not be added to {issue}: {name}")
                 return redirect(url_for("add_project"))
