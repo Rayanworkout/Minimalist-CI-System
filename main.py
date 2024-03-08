@@ -28,13 +28,10 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
-TARGET_BRANCH = "main"
-
-
-# TODO handle target branch according to database
 # Handle test file in folder
 # Handle project name from github delivery
 # Handle private repositories
+
 
 @app.route("/")
 def index():
@@ -71,13 +68,17 @@ def test():
     """
 
     app.logger.info("Test process triggered")
+    db_worker = DBWorker()
 
     json_body = request.json
     branch = json_body["ref"].split("/")[-1]
+    repository_name = json_body["repository"]["name"].lower()
+    pusher, pusher_email = json_body["pusher"]["name"], json_body["pusher"]["email"]
 
-    print(json_body)
+    
+    project_target_branch = db_worker.get_project_target_branch(repository_name)
 
-    if branch != TARGET_BRANCH:
+    if branch != project_target_branch:
         return {"status": "success", "message": "not target branch"}
 
     secret_header = request.headers.get("X-Hub-Signature-256")
@@ -88,8 +89,8 @@ def test():
         signature_header=secret_header,
     ):
 
-        ProjectManager.pull_latest_changes()
-        Tester.perform_tests()
+        ProjectManager.pull_latest_changes(repository_name)
+        Tester.perform_tests(repository_name)
 
         return {"status": "success", "message": "test process triggered"}
 
@@ -123,7 +124,7 @@ def add_project():
 
         # Project does not exist in DB and hasn't been cloned yet
         if not project_exists_in_db and not project_exists_in_folder:
-            
+
             clone_success: bool = ProjectManager.clone_project(github_url)
 
             db_insert_success = db_worker.insert_project_to_database(

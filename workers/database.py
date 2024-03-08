@@ -117,6 +117,23 @@ class DBWorker:
 
         return self.__cursor.fetchone()
 
+    def get_project_target_branch(self, name: str) -> str:
+        """
+        Get the target branch of a project from the database.
+
+        Params:
+            name: name of the project
+
+        Returns:
+            The target branch of the project
+
+        """
+        self.__cursor.execute(
+            """SELECT target_branch FROM projects WHERE name = ?""", (name,)
+        )
+
+        return self.__cursor.fetchone()[0]
+
     def get_all_projects(self) -> list[dict]:
         """
         Get all the projects from the database.
@@ -200,11 +217,12 @@ class DBWorker:
 
         """
         name = name.lower()
-        success = self.__cursor.execute("""DELETE FROM projects WHERE name = ?""", (name,))
+        success = self.__cursor.execute(
+            """DELETE FROM projects WHERE name = ?""", (name,)
+        )
         self.__conn.commit()
 
         return success.rowcount > 0
-        
 
     def project_exists(self, name: str) -> bool:
         """
