@@ -52,3 +52,8 @@
 2024-03-07 10:18:11,253 - INFO - new project added: minimalistwebserver
 2024-03-07 10:18:24,699 - INFO - accessed project: Minimalistwebserver
 2024-03-07 10:18:25,892 - INFO - project deleted: Minimalistwebserver
+2024-03-08 19:42:53,874 - ERROR - project already exists in folder: dummy-ci-repo
+2024-03-08 19:43:12,593 - INFO - new project added: dummy-ci-repo
+2024-03-08 19:43:22,369 - INFO - accessed project: Test_project
+2024-03-08 19:43:23,323 - ERROR - project could not be deleted: Test_project
+2024-03-08 19:43:32,100 - INFO - accessed project: Dummy-ci-repo

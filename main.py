@@ -111,14 +111,15 @@ def add_project():
     if request.method == "POST":
         db_worker = DBWorker()
 
-        name, test_file, github_url, target_branch = (
-            request.form["name"],
+        test_file, github_url, target_branch = (
             request.form["test_file"],
             request.form["github_url"],
             request.form["branch"],
         )
 
-        name = name.lower()  # Project name is lowercase inside the database
+        # We extract the project name from the github url
+        # Project name is lowercase inside the database
+        name = github_url.split("/")[-1].lower()
 
         project_exists_in_db = db_worker.project_exists(name)
         project_exists_in_folder = ProjectManager.project_exists(name)
