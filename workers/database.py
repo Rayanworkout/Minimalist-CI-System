@@ -128,11 +128,13 @@ class DBWorker:
             The target branch of the project
 
         """
+        name = name.lower()
         self.__cursor.execute(
             """SELECT target_branch FROM projects WHERE name = ?""", (name,)
         )
 
-        return self.__cursor.fetchone()[0]
+        if (target_branch := self.__cursor.fetchone()) is not None:
+            return target_branch[0]
 
     def get_all_projects(self) -> list[dict]:
         """
