@@ -35,8 +35,6 @@ TARGET_BRANCH = "main"
 # Handle test file in folder
 # Handle project name from github delivery
 # Handle private repositories
-# Check if a project in database also exists as a folder at every start
-# Get repo name from url and not user input
 
 @app.route("/")
 def index():
