@@ -90,7 +90,7 @@ def test():
 
     if WebhookValidator.verify_signature(
         payload_body=payload,
-        secret_token=secret_header,
+        signature_header=secret_header,
     ):
 
         ProjectManager.pull_latest_changes(repository_name)

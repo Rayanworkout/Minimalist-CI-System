@@ -12,7 +12,7 @@ class WebhookValidator:
     """
 
     @classmethod
-    def verify_signature(cls, payload_body: bytes, secret_token: str) -> bool:
+    def verify_signature(cls, payload_body: bytes, signature_header: str) -> bool:
         """Verify that the payload was sent from GitHub by validating SHA256.
 
         https://docs.github.com/en/webhooks/webhook-events-and-payloads
@@ -23,28 +23,29 @@ class WebhookValidator:
 
         Args:
             payload_body: original request body to verify as bytes
-            secret_token: GitHub app webhook token (WEBHOOK_SECRET)
             signature_header: header received from GitHub (x-hub-signature-256)
         """
 
         load_dotenv()
 
+        # GitHub app webhook token (WEBHOOK_SECRET)
         secret_key = os.getenv("GITHUB_WEBHOOK_SECRET")
+        # secret_key = "It's a Secret to Everybody"  # Test purposes
 
         # No further processing if signature is missing or not retrieved
-        if not secret_key:
+        if secret_key is None or signature_header is None:
             return False
 
         # We encode the secret token and the payload body
         hash_object = hmac.new(
-            secret_token.encode("utf-8"), msg=payload_body, digestmod=hashlib.sha256
+            secret_key.encode("utf-8"), msg=payload_body, digestmod=hashlib.sha256
         )
 
         # We compare the expected signature with the received signature
         expected_signature = "sha256=" + hash_object.hexdigest()
 
         # We use the compare_digest method to prevent timing attacks
-        if hmac.compare_digest(expected_signature, secret_key):
+        if hmac.compare_digest(expected_signature, signature_header):
             return True
 
         return False
