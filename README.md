@@ -13,7 +13,7 @@ The workflow is the following:
 
 Github sends a webhook notification to the server when a new commit is pushed to the repository. The server then runs the tests on the specified branch and keeps track of the results. The results are then displayed on a web page.
 
-![screenshot2](screenshot.png)
+![screenshot2](screenshot2.png)
 
 
 The webhook is secured by a secret token that is shared between Github and the server. This ensures that only authorized users can trigger the pipeline.
@@ -45,15 +45,13 @@ Install project dependancies
 ## Environment Variables
 Now you need to rename `.env.example` to `.env` and put inside the required environment variables.
 
-`FLASK_SECRET_KEY` can be arbitrary, juste make sure to choose a strong key. You can easily generate one with a python shell:
+Your secret keys can be arbitrary, just make sure to choose a strong key. You can easily generate one with a python shell:
 
 ```bash
 >>> import secrets
 >>> print(secrets.token_hex(24))
 ```
 The `GITHUB_WEBHOOK_SECRET` must be created and used on all the projects you wish to monitor.
-
-You can create it the same way you created the `FLASK_SECRET_KEY`, just make sure to keep the same for all your webhooks.
 
 ```bash
 mv .env.example .env
@@ -87,8 +85,8 @@ You may now access your dashboard at `http://your_server_address:8080/`
 ## Things to consider
 
 - It currently works with pytest only, but it can be easily extended to work with other testing frameworks.
-- Your project needs to have a requirements.txt file at the root of the project, containing all the dependancies of your project.
-- your test file must be at the root of the project, and not in a subdirectory.
+- Your project needs to have a requirements.txt file at the root, containing all the dependancies of your project.
+- Your test file must be at the root of the project, and not in a subdirectory.
 
 - This project is for demonstration purposes only. It is not recommended to use it in a production environment without proper security measures.
 - The server is not secured by default. You should consider using a reverse proxy with SSL termination to secure the server.
