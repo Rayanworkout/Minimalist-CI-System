@@ -15,7 +15,6 @@ Github sends a webhook notification to the server when a new commit is pushed to
 
 ![screenshot2](screenshot.png)
 
-![screenshot](screenshot2.png)
 
 The webhook is secured by a secret token that is shared between Github and the server. This ensures that only authorized users can trigger the pipeline.
 
@@ -72,7 +71,7 @@ My Payload URL will be `http://194.135.81.27:8080/test`
 
 The content-type must be `application/json`.
 
-Then paste your secret token and click Add webhook.
+Then paste your secret token (same as `GITHUB_WEBHOOK_SECRET` in your `.env` file) and click Add webhook.
 
 ## Running the server
 
@@ -87,8 +86,8 @@ You may now access your dashboard at `http://your_server_address:8080/`
 
 ## Things to consider
 
-- It currently only work with pytest, but it can be easily extended to work with other testing frameworks.
-- Your project need to have a requirements.txt file at the root of the project, containing all the dependancies of your project.
+- It currently works with pytest only, but it can be easily extended to work with other testing frameworks.
+- Your project needs to have a requirements.txt file at the root of the project, containing all the dependancies of your project.
 - your test file must be at the root of the project, and not in a subdirectory.
 
 - This project is for demonstration purposes only. It is not recommended to use it in a production environment without proper security measures.
