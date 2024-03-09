@@ -28,10 +28,6 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
-# Handle test file in folder
-# Handle project name from github delivery
-# Handle private repositories
-
 
 @app.route("/")
 def index():
@@ -192,11 +188,6 @@ def about():
     return render_template("about.html")
 
 
-# @app.errorhandler(500)
-# def server_error(error):
-#     app.logger.exception('An exception occurred during a request.')
-#     return 'Internal Server Error', 500
-
 
 if __name__ == "__main__":
 
@@ -213,4 +204,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    app.run(debug=True, threaded=True, host=args.host, port=args.port)
+    app.run(threaded=True, host=args.host, port=args.port)
