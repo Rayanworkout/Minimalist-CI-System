@@ -85,11 +85,12 @@ def test():
         return {"status": "success", "message": "not target branch"}
 
     secret_header = request.headers.get("X-Hub-Signature-256")
+    
     payload = request.data
 
     if WebhookValidator.verify_signature(
         payload_body=payload,
-        signature_header=secret_header,
+        secret_token=secret_header,
     ):
 
         ProjectManager.pull_latest_changes(repository_name)
