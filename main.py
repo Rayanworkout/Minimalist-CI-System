@@ -73,9 +73,11 @@ def test():
     json_body = request.json
     branch = json_body["ref"].split("/")[-1]
     repository_name = json_body["repository"]["name"].lower()
-    pusher, pusher_email = json_body["pusher"]["name"], json_body["pusher"]["email"]
+    
+    # pusher, pusher_email = json_body["pusher"]["name"], json_body["pusher"]["email"]
 
     project_target_branch = db_worker.get_project_target_branch(repository_name)
+    
     if project_target_branch is None:
         return {"status": "error", "message": "Project not found"}
 

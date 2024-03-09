@@ -12,7 +12,7 @@ class WebhookValidator:
     """
 
     @classmethod
-    def verify_signature(payload_body: dict, secret_token: str) -> bool:
+    def verify_signature(payload_body: bytes, secret_token: str) -> bool:
         """Verify that the payload was sent from GitHub by validating SHA256.
 
         https://docs.github.com/en/webhooks/webhook-events-and-payloads
@@ -22,7 +22,7 @@ class WebhookValidator:
             True if the signature is valid
 
         Args:
-            payload_body: original request body to verify (request.body())
+            payload_body: original request body to verify
             secret_token: GitHub app webhook token (WEBHOOK_SECRET)
             signature_header: header received from GitHub (x-hub-signature-256)
         """
