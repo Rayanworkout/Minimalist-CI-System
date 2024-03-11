@@ -191,7 +191,9 @@ def about():
 
 if __name__ == "__main__":
 
+    # Allowing to pass host and port at runtime
     parser = argparse.ArgumentParser(description="Simple Continuous Integration Server")
+    
     # Port
     parser.add_argument(
         "--port", type=int, default=8080, help="Port number for the server"
