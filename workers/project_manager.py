@@ -6,7 +6,7 @@ from workers.enums import ExitCodes
 
 class ProjectManager:
     """
-    Clone, pull and manage projects files.
+    Clone, pull and manage projects files and folders.
     """
 
     # Get the path of the current Python script
