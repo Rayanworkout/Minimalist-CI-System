@@ -91,7 +91,7 @@ class Tester:
         return (project_name, test_result, testcases)
 
     @classmethod
-    def perform_tests(cls, project_name: str) -> list[dict]:
+    def perform_tests(cls, project_name: str) -> None:
         """
         Run tests for a specific projects.
 
@@ -102,7 +102,7 @@ class Tester:
         # Check if project exists in the database
         project = cls.__db_worker.get_project(
             project_name.lower()
-        )  # project_name is lowercased in the database
+        )  # project_name is always lowercase in the database
 
         if project is None:
             return {
@@ -123,5 +123,6 @@ class Tester:
         project_name, test_result, testcases = cls.parse_junitxml_file(project_name)
 
         batch_id = cls.__db_worker.insert_test_batch(project_id, test_result)
-
+        
+        # Add testcases to the database
         cls.__db_worker.insert_many_test_cases(batch_id, list(testcases))
