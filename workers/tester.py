@@ -84,6 +84,8 @@ class Tester:
 
         # Extract the testcases
         testcases_elems = root[0].findall("testcase")
+        
+        # generator expression
         testcases = (
             (elem.attrib["name"], elem.attrib["time"]) for elem in testcases_elems
         )
@@ -95,7 +97,7 @@ class Tester:
         """
         Run tests for a specific projects.
 
-        Insert the result to the database.
+        Insert the test results to the database.
 
         """
 
