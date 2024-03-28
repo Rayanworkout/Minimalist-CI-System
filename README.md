@@ -1,6 +1,6 @@
 # A Minimalist CI Pipeline
 
-_This project is currently under development. You may experience bugs. Contributions are warmly welcomed._
+Disclaimer: This project is not finished, and I may not continue its development. Everything is working but many features are still missing. Feel free to contribute to this project and / or adapt it to your needs._
 
 ## Demo
 
