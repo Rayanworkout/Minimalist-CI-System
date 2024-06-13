@@ -85,7 +85,7 @@ You may now access your dashboard at `http://your_server_address:8080/`
 ## Things to consider
 
 - It currently works with pytest only, but it can be easily extended to work with other testing frameworks.
-- Your project needs to have a requirements.txt file at the root, containing all the dependancies of your project.
+- Your project needs to have a requirements.txt file at the root, containing all the dependencies of your project.
 - Your test file must be at the root of the project, and not in a subdirectory.
 
 - This project is for demonstration purposes only. It is not recommended to use it in a production environment without proper security measures.
