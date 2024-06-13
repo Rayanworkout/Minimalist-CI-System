@@ -1,6 +1,6 @@
 # A Minimalist CI Pipeline
 
-Disclaimer: This project is not finished, and I may not continue its development. Everything is working but many features are still missing. Feel free to contribute to this project and / or adapt it to your needs._
+_Disclaimer: This project is only a POC. Everything is working but many features are still missing and it may not work on all systems. Feel free to contribute to this project and / or adapt it to your needs._
 
 ## Demo
 
