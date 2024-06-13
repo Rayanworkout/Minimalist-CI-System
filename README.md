@@ -63,9 +63,9 @@ To create a webhook for your project, just go to the github repository you wish 
 
 The Payload URL is the address of your server and the port you chose, along with `/test` endpoint. The server will run on port **8080** by default.
 
-For example, my server address is `http://194.135.81.27`. I will let the default port.
+For example, if my server IP address is `10.125.81.27`. I will let the default port.
 
-My Payload URL will be `http://194.135.81.27:8080/test`
+My Payload URL will be `http://10.125.81.27:8080/test`
 
 The content-type must be `application/json`.
 
