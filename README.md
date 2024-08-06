@@ -2,10 +2,6 @@
 
 _Disclaimer: This project is only a POC. Everything is working but many features are still missing and it may not work on all systems. Feel free to contribute to this project and / or adapt it to your needs._
 
-## Demo
-
-Demo deployment is available at https://simple-ci.rayan.sh/
-
 ## What is it ?
 This small yet robust self hosted Continuous Integration system can be self-hosted on your server to run tests and monitor the results. It is designed to be simple to understand and easy to extend. Every part of the system is modular and can be replaced / extended with a different implementation. Every function is well documented and easy to understand.
 
